@@ -4,6 +4,7 @@ import {
 	DeleteOutlined,
 	SearchOutlined,
 	EyeOutlined,
+	WifiOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 
@@ -13,6 +14,7 @@ const QuizzesTable = ({
 	handleDelete,
 	handleEdit,
 	handleDetail,
+	handleHosting,
 }) => {
 	const [search, setSearch] = useState("");
 	const columns = [
@@ -35,6 +37,14 @@ const QuizzesTable = ({
 			align: "right",
 			render: (id) => (
 				<Space>
+					<Tooltip title="Host">
+						<Button
+							type="default"
+							shape="circle"
+							icon={<WifiOutlined />}
+							onClick={() => handleHosting(id)}
+						/>
+					</Tooltip>
 					<Tooltip title="View">
 						<Button
 							type="default"

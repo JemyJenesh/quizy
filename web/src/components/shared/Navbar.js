@@ -28,7 +28,7 @@ const Navbar = () => {
 				selectedKeys={[location.pathname]}
 			>
 				{routes
-					.filter((route) => !route.auth)
+					.filter((route) => !route.auth && route.show)
 					.map(({ path, name, exact }) => (
 						<Menu.Item key={path}>
 							<NavLink to={path} exact={exact}>

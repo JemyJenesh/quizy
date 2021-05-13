@@ -20,6 +20,9 @@ import QuizzesHeader from "./quizzes/QuizzesHeader";
 import QuizzesCreateModal from "./quizzes/QuizzesCreateModal";
 import QuizzesEditModal from "./quizzes/QuizzesEditModal";
 import QuizQuestionsTable from "./quizzes/QuizQuestionsTable";
+// players
+import PlayersList from "./players/PlayersList";
+import PlayerInfo from "./players/PlayerInfo";
 
 export {
 	// shared
@@ -44,4 +47,7 @@ export {
 	QuizzesCreateModal,
 	QuizzesEditModal,
 	QuizQuestionsTable,
+	// players
+	PlayersList,
+	PlayerInfo,
 };

@@ -1,5 +1,11 @@
 import { message } from "antd";
-import { useCreateQuiz, useDeleteQuiz, useQuizzes, useUpdateQuiz } from "api";
+import {
+	useCreateGame,
+	useCreateQuiz,
+	useDeleteQuiz,
+	useQuizzes,
+	useUpdateQuiz,
+} from "api";
 import {
 	AppLayout,
 	QuizzesCreateModal,
@@ -65,6 +71,14 @@ const Quizzes = ({ history }) => {
 
 	const gotoDetailsPage = (id) => history.push(`/quizzes/${id}`);
 
+	const { mutate: mutateGame } = useCreateGame();
+	const hostQuiz = (id) => {
+		mutateGame(
+			{ quiz_id: id },
+			{ onSuccess: () => history.push(`/quizzes/${id}/game`) }
+		);
+	};
+
 	return (
 		<AppLayout>
 			{quiz && (
@@ -86,6 +100,7 @@ const Quizzes = ({ history }) => {
 				handleDelete={handleDelete}
 				handleEdit={openEditModal}
 				handleDetail={gotoDetailsPage}
+				handleHosting={hostQuiz}
 			/>
 		</AppLayout>
 	);

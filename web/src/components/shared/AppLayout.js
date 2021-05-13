@@ -15,6 +15,7 @@ const AppLayout = ({ children }) => {
 
 			<Content
 				style={{
+					backgroundColor: "white",
 					position: "relative",
 					// marginTop: show ? 64 : 0,
 					minHeight: !user ? "calc(100vh - 64px)" : "100vh",

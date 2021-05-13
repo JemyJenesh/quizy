@@ -1,11 +1,29 @@
-import { Form, Input, Button, Row, Col, InputNumber } from "antd";
+import { Form, Input, Button, Row, Col, InputNumber, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import { AppLayout } from "components";
+import { axios } from "utils/axios";
+import { useState } from "react";
 
-const Welcome = () => {
+const Welcome = ({ history }) => {
+	const [loading, setLoading] = useState(false);
+
 	const onFinish = (values) => {
-		console.log("Received values of form: ", values);
+		setLoading(true);
+		axios
+			.post("/players", values)
+			.then((res) => {
+				if (res.status === 200) {
+					history.push(`/quizzes/${res.data.quiz_id}/players/${res.data.id}`);
+				}
+			})
+			.catch((err) => {
+				if (err.response) {
+					const errors = err.response.data.errors;
+					Object.keys(errors).map((e) => message.error(errors[e][0]));
+				}
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
@@ -54,7 +72,7 @@ const Welcome = () => {
 				</Row>
 				<Row justify="center">
 					<Col xs={24} md={12} lg={6}>
-						<Button type="primary" htmlType="submit" block>
+						<Button type="primary" htmlType="submit" block loading={loading}>
 							Join
 						</Button>
 					</Col>

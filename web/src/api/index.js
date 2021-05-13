@@ -15,6 +15,9 @@ import useCreateQuiz from "./quizzes/useCreateQuiz";
 import useDeleteQuiz from "./quizzes/useDeleteQuiz";
 import useQuiz from "./quizzes/useQuiz";
 import useCreateQuizQuestions from "./quizzes/useCreateQuizQuestions";
+import useGame from "./games/useGame";
+import useCreateGame from "./games/useCreateGame";
+import useDeleteGame from "./games/useDeleteGame";
 
 export {
 	// categories
@@ -34,4 +37,8 @@ export {
 	useUpdateQuiz,
 	useDeleteQuiz,
 	useCreateQuizQuestions,
+	// games
+	useGame,
+	useCreateGame,
+	useDeleteGame,
 };
