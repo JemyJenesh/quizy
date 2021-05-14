@@ -37,3 +37,5 @@ Route::apiResource('quiz-questions', QuizQuestionController::class);
 Route::apiResource('games', GameController::class);
 Route::apiResource('quizzes.players', QuizPlayerController::class)->only(['index']);
 Route::apiResource('players', QuizPlayerController::class)->only(['store', 'destroy', 'show']);
+
+Route::post('/answers', [GameController::class, 'answer']);

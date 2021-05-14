@@ -1,18 +1,22 @@
 import { List, Typography } from "antd";
 
-const PlayerInfo = ({ player }) => {
+const PlayerInfo = ({ player, turn }) => {
 	return (
-		<List
-			size="small"
-			header={
-				<Typography.Title level={5} style={{ margin: 0 }}>
-					{player?.name} (You)
-				</Typography.Title>
-			}
-			bordered
-			loading={!player}
-		>
-			{/* <List.Item actions={[<Typography.Text>20</Typography.Text>]}>
+		<>
+			<List
+				style={{
+					backgroundColor: player && player.order === turn ? "#E6F7FF" : "#fff",
+				}}
+				size="small"
+				header={
+					<Typography.Title level={5} style={{ margin: 0 }}>
+						{player?.name} (You)
+					</Typography.Title>
+				}
+				bordered
+				loading={!player}
+			>
+				{/* <List.Item actions={[<Typography.Text>20</Typography.Text>]}>
 				Attempts
 			</List.Item>
 			<List.Item
@@ -25,10 +29,13 @@ const PlayerInfo = ({ player }) => {
 			>
 				Bonus Score
 			</List.Item> */}
-			<List.Item actions={[<Typography.Text>{player?.score}</Typography.Text>]}>
-				Score
-			</List.Item>
-		</List>
+				<List.Item
+					actions={[<Typography.Text>{player?.score}</Typography.Text>]}
+				>
+					Score
+				</List.Item>
+			</List>
+		</>
 	);
 };
 

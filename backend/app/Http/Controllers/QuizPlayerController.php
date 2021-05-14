@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\PlayerJoined;
 use App\Events\PlayerKicked;
 use App\Http\Resources\PlayerResource;
+use App\Http\Resources\QuestionResource;
 use App\Models\Player;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
@@ -22,7 +23,9 @@ class QuizPlayerController extends Controller {
   }
 
   public function show(Player $player) {
-    return response($player);
+    $quiz = $player->quiz;
+    $question = $player->quiz->question ? new QuestionResource($player->quiz->question) : null;
+    return response(compact('quiz', 'player', 'question'));
   }
 
   /**
@@ -54,7 +57,7 @@ class QuizPlayerController extends Controller {
     ]);
     $player = $quiz->players()->create([
       "name" => $request->name,
-      "order" => $quiz->players_count + 1,
+      "order" => $quiz->players->count() + 1,
     ]);
 
     PlayerJoined::dispatch($player);

@@ -1,13 +1,23 @@
-import { Badge, Button, List, message, Typography, Tooltip } from "antd";
+import {
+	Badge,
+	Button,
+	List,
+	message,
+	Typography,
+	Tooltip,
+	notification,
+	Empty,
+} from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import { selectUser } from "store/authSlice";
 import { axios } from "utils/axios";
 import echo from "utils/echo";
+import FlipMove from "react-flip-move";
 
-const PlayersList = ({ quizId }) => {
+const PlayersList = ({ quizId, turn }) => {
 	const params = useParams();
 	const history = useHistory();
 	const user = useSelector(selectUser);
@@ -34,7 +44,7 @@ const PlayersList = ({ quizId }) => {
 		axios(`/quizzes/${quizId}/players`)
 			.then((res) => {
 				if (res.status === 200) {
-					setPlayers(res.data.data);
+					setPlayers(res.data.data.sort((a, b) => b.score - a.score));
 				}
 			})
 			.catch((err) => {
@@ -72,6 +82,19 @@ const PlayersList = ({ quizId }) => {
 			);
 		});
 
+		echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
+			if (e.correct) {
+				notification.success({
+					message: "Correct Answer!",
+				});
+			} else {
+				notification.error({
+					message: "Wrong Answer!",
+				});
+			}
+			setPlayers(e.players.sort((a, b) => b.score - a.score));
+		});
+
 		return () => {
 			echo.leaveChannel(`quiz-${quizId}`);
 		};
@@ -81,37 +104,50 @@ const PlayersList = ({ quizId }) => {
 		<List
 			size="small"
 			loading={loading}
+			dataSource={players && players}
 			header={
 				<Typography.Title level={5} style={{ margin: 0 }}>
 					Players
 				</Typography.Title>
 			}
 			bordered
-			dataSource={players && players}
 			itemLayout="horizontal"
-			renderItem={({ id, name, score }) => (
-				<List.Item
-					key={id}
-					actions={[
-						user ? (
-							<Tooltip title="Kick" key="kick">
-								<Button
-									shape="circle"
-									danger
-									icon={<DeleteOutlined />}
-									onClick={() => kickPlayer(id)}
-								></Button>
-							</Tooltip>
-						) : (
-							<Badge key="score" count={score} />
-						),
-					]}
-				>
-					{name}
-				</List.Item>
-			)}
-		></List>
+		>
+			<FlipMove>
+				{players && players.length > 0 ? (
+					players.map(({ id, name, score, order }) => (
+						<Wrapper key={id}>
+							<List.Item
+								style={{ backgroundColor: order === turn ? "#E6F7FF" : "#fff" }}
+								actions={[
+									user && turn < 1 ? (
+										<Tooltip title="Kick" key="kick">
+											<Button
+												shape="circle"
+												danger
+												icon={<DeleteOutlined />}
+												onClick={() => kickPlayer(id)}
+											></Button>
+										</Tooltip>
+									) : (
+										<Badge key="score" count={score} />
+									),
+								]}
+							>
+								{name}
+							</List.Item>
+						</Wrapper>
+					))
+				) : (
+					<Empty />
+				)}
+			</FlipMove>
+		</List>
 	);
 };
+
+const Wrapper = forwardRef((props, ref) => (
+	<div ref={ref}>{props.children}</div>
+));
 
 export default PlayersList;

@@ -18,6 +18,7 @@ class QuizDetailResource extends JsonResource {
       'id' => $this->id,
       'name' => $this->name,
       'description' => $this->description,
+      'turn' => $this->turn,
       // 'quizQuestions' => QuizQuestionResource::collection($this->quizQuestions()->with('question')->get()),
       'quizQuestions' => QuestionResource::collection(
         Question::whereIn('id', $this->quizQuestions()->get()->pluck('question_id'))->get()

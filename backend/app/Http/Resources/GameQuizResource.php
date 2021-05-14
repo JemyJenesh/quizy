@@ -18,6 +18,7 @@ class GameQuizResource extends JsonResource {
       'id' => $this->id,
       'name' => $this->name,
       'description' => $this->description,
+      'turn' => $this->turn,
       'pin' => $this->pin,
       'quizQuestions' => QuizQuestionResource::collection($this->quizQuestions()->with('question')->get())->groupBy('question.category.name'),
       'categories' => Category::select('id', 'name')->withCount(['questions', 'questions as remaining_questions_count' => function ($query) {

@@ -85,7 +85,7 @@ const Game = ({ history }) => {
 			<div style={{ padding: "2rem" }}>
 				<Row gutter={24}>
 					<Col span={6}>
-						<PlayersList quizId={id} />
+						<PlayersList quizId={id} turn={data && data.data.turn} />
 					</Col>
 					<Col span={18}>
 						<Space align="center" style={{ marginBottom: "1rem" }}>
