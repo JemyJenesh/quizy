@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Events\PlayerAnswered;
 use App\Events\QuestionChanged;
+use App\Events\QuestionPassed;
+use App\Events\QuestionPassingEnd;
 use App\Events\QuizEnded;
 use App\Http\Resources\GameQuizResource;
 use App\Models\Option;
@@ -13,7 +15,7 @@ use Illuminate\Http\Request;
 
 class GameController extends Controller {
   public function __construct() {
-    $this->middleware('auth:sanctum')->except('answer');
+    $this->middleware('auth:sanctum')->except(['answer', 'pass']);
   }
 
   /**
@@ -76,10 +78,19 @@ class GameController extends Controller {
       $question->update([
         'is_selected' => true,
       ]);
-      $quiz->update([
-        'question_id' => $question->question_id,
-        'turn' => ($quiz->turn % $quiz->players->count()) + 1,
-      ]);
+      if ($quiz->is_passed) {
+        $quiz->update([
+          'question_id' => $question->question_id,
+          'turn' => ($quiz->pass % $quiz->players->count()) + 1,
+          'pass' => 0,
+          'is_passed' => false,
+        ]);
+      } else {
+        $quiz->update([
+          'question_id' => $question->question_id,
+          'turn' => ($quiz->turn % $quiz->players->count()) + 1,
+        ]);
+      }
       QuestionChanged::dispatch($quiz);
     }
 
@@ -99,6 +110,7 @@ class GameController extends Controller {
       'pin' => null,
       'question_id' => null,
       'turn' => 0,
+      'pass' => 0,
     ]);
     $quiz->quizQuestions()->update([
       'is_selected' => false,
@@ -110,16 +122,30 @@ class GameController extends Controller {
 
   public function answer(Request $request) {
     $request->validate([
-      'option_id' => 'required',
       'player_id' => 'required',
     ]);
 
+    $player = Player::find($request->player_id);
+
+    if (is_null($request->option_id)) {
+      $player->update([
+        'score' => $player->score - 2,
+      ]);
+
+      PlayerAnswered::dispatch($player->quiz_id, null);
+
+      return response(null, 200);
+    }
+
     $isCorrect = Option::find($request->option_id)->is_correct;
 
-    $player = Player::find($request->player_id);
     if ($isCorrect) {
       $player->update([
-        'score' => $player->score + 10,
+        'score' => $player->score + $player->quiz->is_passed ? 5 : 10,
+      ]);
+    } else {
+      $player->update([
+        'score' => $player->score - 2,
       ]);
     }
 
@@ -128,4 +154,29 @@ class GameController extends Controller {
     return response(null, 200);
 
   }
+
+  public function pass(Request $request) {
+    $request->validate([
+      'player_id' => 'required',
+    ]);
+
+    $player = Player::find($request->player_id);
+    $nextTurn = ($player->quiz->turn % $player->quiz->players->count()) + 1;
+
+    if ($player->quiz->pass === $nextTurn) {
+      QuestionPassingEnd::dispatch($player->quiz);
+      return response(null, 200);
+    }
+    $player->quiz()->update([
+      'turn' => $nextTurn,
+      'pass' => $player->quiz->is_passed ? $player->quiz->pass : $player->quiz->turn,
+      'is_passed' => true,
+    ]);
+
+    QuestionPassed::dispatch($player->quiz);
+
+    return response(null, 200);
+
+  }
+
 }

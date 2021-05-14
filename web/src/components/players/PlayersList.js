@@ -83,7 +83,11 @@ const PlayersList = ({ quizId, turn }) => {
 		});
 
 		echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
-			if (e.correct) {
+			if (e.correct === null) {
+				notification.warning({
+					message: "Time's Up!",
+				});
+			} else if (e.correct) {
 				notification.success({
 					message: "Correct Answer!",
 				});

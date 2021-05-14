@@ -19,6 +19,7 @@ import echo from "utils/echo";
 const { CheckableTag } = Tag;
 
 const COUNTDOWN = 20;
+const PASS_COUNTDOWN = 10;
 
 const Player = ({ history }) => {
 	const timer = useRef();
@@ -33,16 +34,35 @@ const Player = ({ history }) => {
 	const [isTurn, setIsTurn] = useState(false);
 	const [time, setTime] = useState(0);
 
-	const handleSubmit = () => {
-		if (answer === null) {
-			message.warning("Please selected one option!");
-			return;
-		}
+	const submit = () => {
 		clearInterval(timer.current);
 		setTime(0);
 		axios
 			.post("/answers", {
 				option_id: answer,
+				player_id: playerId,
+			})
+			.catch((err) => {
+				if (err.response) {
+					message.error("Something went wrong!");
+				}
+			});
+		setAnswered(true);
+	};
+
+	const handleSubmit = () => {
+		if (answer === null) {
+			message.warning("Please selected one option!");
+			return;
+		}
+		submit();
+	};
+
+	const handlePass = () => {
+		clearInterval(timer.current);
+		setTime(0);
+		axios
+			.post("/pass", {
 				player_id: player.id,
 			})
 			.catch((err) => {
@@ -82,12 +102,37 @@ const Player = ({ history }) => {
 			let cd = COUNTDOWN;
 			timer.current = setInterval(() => {
 				if (cd < 1) {
+					if (isTurn) submit();
 					clearInterval(timer.current);
 				} else {
 					cd--;
 					setTime((prev) => prev - 1);
 				}
 			}, 1000);
+		});
+		echo.channel(`quiz-${quizId}`).listen("QuestionPassed", (e) => {
+			console.log(e);
+			setAnswered(false);
+			setAnswer(null);
+			setQuiz(e.quiz);
+			setTime(PASS_COUNTDOWN);
+			let cd = PASS_COUNTDOWN;
+			clearInterval(timer.current);
+			timer.current = setInterval(() => {
+				if (cd < 1) {
+					if (isTurn) submit();
+					clearInterval(timer.current);
+				} else {
+					cd--;
+					setTime((prev) => prev - 1);
+				}
+			}, 1000);
+		});
+
+		echo.channel(`quiz-${quizId}`).listen("QuestionPassingEnd", (e) => {
+			setTime(0);
+			clearInterval(timer.current);
+			message.info("The question is now passed to Audience!");
 		});
 
 		echo.channel(`quiz-${quizId}`).listen("QuizEnded", (e) => {
@@ -125,7 +170,12 @@ const Player = ({ history }) => {
 							<Progress
 								type="circle"
 								width={100}
-								percent={100 - ((COUNTDOWN - time) / COUNTDOWN) * 100}
+								percent={
+									100 -
+									(((quiz.is_passed ? PASS_COUNTDOWN : COUNTDOWN) - time) /
+										(quiz.is_passed ? PASS_COUNTDOWN : COUNTDOWN)) *
+										100
+								}
 								format={(percent) => `${time} s`}
 							/>
 							<Typography.Title level={1} style={styles.text}>
@@ -161,7 +211,14 @@ const Player = ({ history }) => {
 							</Row>
 							{quiz.turn === player.order && (
 								<Space>
-									{/* <Button key="pass">Pass</Button> */}
+									<Button
+										key="pass"
+										size="large"
+										disabled={time < 1 || answered}
+										onClick={handlePass}
+									>
+										Pass
+									</Button>
 									<Button
 										type="primary"
 										key="submit"

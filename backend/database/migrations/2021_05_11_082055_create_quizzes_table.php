@@ -17,6 +17,8 @@ class CreateQuizzesTable extends Migration {
       $table->string('description')->nullable();
       $table->string('pin')->nullable();
       $table->integer('turn')->default(0);
+      $table->integer('pass')->default(0);
+      $table->boolean('is_passed')->default(false);
       $table->foreignId('question_id')->nullable()->constrained();
       $table->foreignId('user_id')->constrained()->onDelete('cascade');
       $table->timestamps();
