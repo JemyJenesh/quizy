@@ -1,21 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-	Button,
-	List,
-	PageHeader,
-	Popconfirm,
-	Row,
-	Col,
-	Tag,
-	Space,
-	Select,
-} from "antd";
-import { MenuOutlined } from "@ant-design/icons";
+import { Button, List, Popconfirm, Row, Col, Tag, Space, Select } from "antd";
 import { useDeleteGame, useGame } from "api";
-import { AppLayout, PageLoader, PlayersList } from "components";
-import { useDispatch } from "react-redux";
+import { AppLayout, Header, PageLoader, PlayersList } from "components";
 import { useParams } from "react-router";
-import { toggleSidebar } from "store/sidebarSlice";
 import Checkbox from "antd/lib/checkbox/Checkbox";
 import { axios } from "utils/axios";
 
@@ -23,8 +10,6 @@ const { Option } = Select;
 
 const Game = ({ history }) => {
 	const { id } = useParams();
-	const dispatch = useDispatch();
-	const toggle = () => dispatch(toggleSidebar());
 
 	const [category, setCategory] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -65,9 +50,7 @@ const Game = ({ history }) => {
 
 	return (
 		<AppLayout>
-			<PageHeader
-				onBack={toggle}
-				backIcon={<Button type="text" shape="circle" icon={<MenuOutlined />} />}
+			<Header
 				title={data.data.name}
 				subTitle={data.data.pin}
 				extra={[

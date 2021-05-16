@@ -8,6 +8,7 @@ import {
 } from "api";
 import {
 	AppLayout,
+	Header,
 	QuizzesCreateModal,
 	QuizzesEditModal,
 	QuizzesHeader,
@@ -93,7 +94,11 @@ const Quizzes = ({ history }) => {
 				handleClose={toggleModal}
 				handleCreate={handleCreate}
 			/>
-			<QuizzesHeader handleRefresh={refetch} handleCreate={toggleModal} />
+			<Header
+				title="Quizzes"
+				handleRefresh={refetch}
+				handleCreate={toggleModal}
+			/>
 			<QuizzesTable
 				data={!isLoading && data.data}
 				loading={isLoading || isFetching}

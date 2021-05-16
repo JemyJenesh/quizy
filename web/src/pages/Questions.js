@@ -9,8 +9,8 @@ import {
 	AppLayout,
 	QuestionsEditModal,
 	QuestionsCreateModal,
-	QuestionsHeader,
 	QuestionsTable,
+	Header,
 } from "components";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
@@ -100,7 +100,11 @@ const Questions = () => {
 					handleEdit={handleEdit}
 				/>
 			)}
-			<QuestionsHeader handleCreate={toggleModal} handleRefresh={refetch} />
+			<Header
+				title="Questions"
+				handleRefresh={refetch}
+				handleCreate={toggleModal}
+			/>
 			<QuestionsTable
 				data={!isLoading && data.data}
 				loading={isLoading || isFetching}

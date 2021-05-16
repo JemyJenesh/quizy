@@ -9,8 +9,8 @@ import {
 	AppLayout,
 	CategoriesCreateModal,
 	CategoriesEditModal,
-	CategoriesHeader,
 	CategoriesTable,
+	Header,
 } from "components";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
@@ -82,7 +82,11 @@ const Categories = () => {
 					handleEdit={handleEdit}
 				/>
 			)}
-			<CategoriesHeader handleCreate={toggleModal} handleRefresh={refetch} />
+			<Header
+				title="Categories"
+				handleRefresh={refetch}
+				handleCreate={toggleModal}
+			/>
 			<CategoriesTable
 				data={!isLoading && data.data}
 				loading={isLoading || isFetching}
