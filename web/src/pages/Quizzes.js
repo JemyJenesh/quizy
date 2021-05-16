@@ -11,7 +11,6 @@ import {
 	Header,
 	QuizzesCreateModal,
 	QuizzesEditModal,
-	QuizzesHeader,
 	QuizzesTable,
 } from "components";
 import { useState } from "react";

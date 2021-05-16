@@ -17,18 +17,4 @@ const setAuthToken = (token) => {
 	}
 };
 
-// axios.interceptors.response.use(
-// 	(res) => res,
-// 	(err) => {
-// 		if (typeof err.response === "undefined") {
-// 			toast.error("Something went wrong, try later!");
-// 		} else if (401 === err.response.status) {
-// 			toast.error("Please login to continue!");
-// 			Cookies.remove("authToken");
-// 		} else {
-// 			return Promise.reject(err);
-// 		}
-// 	}
-// );
-
 export { axios, setAuthToken };

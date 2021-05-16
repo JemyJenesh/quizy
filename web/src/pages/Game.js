@@ -76,9 +76,6 @@ const Game = ({ history }) => {
 							<Select
 								style={{ width: 200 }}
 								onChange={(id) => {
-									console.log(
-										data.data.categories.find((cat) => cat.id === id)
-									);
 									setCategory(
 										data.data.categories.find((cat) => cat.id === id)
 									);
