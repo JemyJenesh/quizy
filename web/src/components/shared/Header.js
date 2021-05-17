@@ -28,6 +28,7 @@ const Header = ({
 				background: "#fff",
 				padding: ".5rem 2rem",
 				borderBottom: "2px solid #eee",
+				zIndex: 2,
 			}}
 			onBack={handleToggle}
 			backIcon={<MenuOutlined />}
