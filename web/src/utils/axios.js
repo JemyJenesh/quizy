@@ -2,7 +2,7 @@ import Axios from "axios";
 import Cookies from "js-cookie";
 
 const axios = Axios.create({
-	baseURL: "http://127.0.0.1:8000/api",
+	baseURL: "http://jenesh.com.np/api",
 });
 
 const setAuthToken = (token) => {
