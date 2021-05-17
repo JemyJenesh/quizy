@@ -2,7 +2,7 @@ import Axios from "axios";
 import Cookies from "js-cookie";
 
 const axios = Axios.create({
-	baseURL: "http://jenesh.com.np/api",
+	baseURL: "http://jenesh.com.np/quizy/api",
 });
 
 const setAuthToken = (token) => {
