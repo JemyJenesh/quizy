@@ -10,6 +10,10 @@ class Quiz extends Model {
 
   protected $guarded = [];
 
+  protected $casts = [
+    'is_passed' => 'boolean',
+  ];
+
   public function user() {
     return $this->belongsTo(User::class);
   }

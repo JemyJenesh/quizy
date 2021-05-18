@@ -10,6 +10,10 @@ class Option extends Model {
 
   protected $guarded = [];
 
+  protected $casts = [
+    'is_correct' => 'boolean',
+  ];
+
   public function question() {
     return $this->belongsTo(Question::class);
   }
