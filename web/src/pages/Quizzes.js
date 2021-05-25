@@ -1,4 +1,4 @@
-import { useCreateGame, useIndex } from "api";
+import { useIndex } from "api";
 import {
 	AppLayout,
 	Header,
@@ -26,14 +26,6 @@ const Quizzes = ({ history }) => {
 
 	const gotoDetailsPage = (id) => history.push(`/quizzes/${id}`);
 
-	const { mutate: mutateGame } = useCreateGame();
-	const hostQuiz = (id) => {
-		mutateGame(
-			{ quiz_id: id },
-			{ onSuccess: () => history.push(`/quizzes/${id}/game`) }
-		);
-	};
-
 	return (
 		<AppLayout>
 			<QuizzesEditModal quiz={quiz} handleClose={() => setQuiz(null)} />
@@ -48,7 +40,6 @@ const Quizzes = ({ history }) => {
 				loading={isLoading || isFetching}
 				handleEdit={openEditModal}
 				handleDetail={gotoDetailsPage}
-				handleHosting={hostQuiz}
 			/>
 		</AppLayout>
 	);

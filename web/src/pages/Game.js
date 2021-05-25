@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, List, Popconfirm, Row, Col, Tag, Space, Select } from "antd";
-import { useDeleteGame, useGame } from "api";
-import { AppLayout, Header, PageLoader, PlayersList } from "components";
+import { useDelete, useShow } from "api";
+import { Header, PageLoader, PlayersList } from "components";
 import { useParams } from "react-router";
 import Checkbox from "antd/lib/checkbox/Checkbox";
 import { axios } from "utils/axios";
@@ -14,8 +14,8 @@ const Game = ({ history }) => {
 	const [category, setCategory] = useState(null);
 	const [loading, setLoading] = useState(false);
 
-	const { data, isLoading, refetch } = useGame(id);
-	const { mutate } = useDeleteGame();
+	const { data, isLoading, refetch } = useShow("/games", id);
+	const { mutate, isLoading: isEnding } = useDelete("/games");
 
 	const endQuiz = () => {
 		mutate(id, { onSuccess: () => history.goBack() });
@@ -57,7 +57,9 @@ const Game = ({ history }) => {
 						placement="topRight"
 						onConfirm={endQuiz}
 					>
-						<Button type="dashed">End Quiz</Button>
+						<Button loading={isEnding} type="dashed">
+							End Quiz
+						</Button>
 					</Popconfirm>,
 				]}
 			/>

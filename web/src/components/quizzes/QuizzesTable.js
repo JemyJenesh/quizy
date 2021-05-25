@@ -16,17 +16,13 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import Highlighter from "react-highlight-words";
-import { useDelete } from "api";
+import { useCreate, useDelete } from "api";
+import { useHistory } from "react-router-dom";
 
-const QuizzesTable = ({
-	data,
-	loading,
-	handleEdit,
-	handleDetail,
-	handleHosting,
-}) => {
+const QuizzesTable = ({ data, loading, handleEdit, handleDetail }) => {
 	const [search, setSearch] = useState("");
 	const [id, setId] = useState(null);
+	const history = useHistory();
 	const columns = [
 		{
 			title: "Name",
@@ -60,6 +56,7 @@ const QuizzesTable = ({
 							type="default"
 							shape="circle"
 							icon={<WifiOutlined />}
+							loading={rowId === id && isCreating}
 							onClick={() => handleHosting(rowId)}
 						/>
 					</Tooltip>
@@ -114,6 +111,21 @@ const QuizzesTable = ({
 			},
 			onSettled: () => setId(null),
 		});
+	};
+
+	const { mutate: mutateGame, isLoading: isCreating } = useCreate("/games");
+	const handleHosting = (id) => {
+		setId(id);
+		mutateGame(
+			{ quiz_id: id },
+			{
+				onError: () => {
+					message.error("Something went wrong, try again!");
+				},
+				onSuccess: () => history.push(`/quizzes/${id}/game`),
+				onSettled: () => setId(null),
+			}
+		);
 	};
 
 	return (
