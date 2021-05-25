@@ -14,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useDelete } from "api";
+import Highlighter from "react-highlight-words";
 
 const CategoriesTable = ({ data, loading, handleEdit }) => {
 	const [search, setSearch] = useState("");
@@ -22,6 +23,14 @@ const CategoriesTable = ({ data, loading, handleEdit }) => {
 		{
 			title: "Name",
 			dataIndex: "name",
+			render: (name) => (
+				<Highlighter
+					autoEscape
+					highlightClassName="text-highlight"
+					searchWords={[search]}
+					textToHighlight={name}
+				/>
+			),
 		},
 		{
 			title: "Description",

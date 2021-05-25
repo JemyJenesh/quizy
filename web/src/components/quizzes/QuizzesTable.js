@@ -7,6 +7,7 @@ import {
 	WifiOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import Highlighter from "react-highlight-words";
 
 const QuizzesTable = ({
 	data,
@@ -21,6 +22,14 @@ const QuizzesTable = ({
 		{
 			title: "Name",
 			dataIndex: "name",
+			render: (name) => (
+				<Highlighter
+					autoEscape
+					highlightClassName="text-highlight"
+					searchWords={[search]}
+					textToHighlight={name}
+				/>
+			),
 		},
 		{
 			title: "Description",

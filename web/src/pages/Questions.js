@@ -1,10 +1,4 @@
-import { message } from "antd";
-import {
-	useQuestions,
-	useCreateQuestion,
-	useDeleteQuestion,
-	useUpdateQuestion,
-} from "api";
+import { useIndex } from "api";
 import {
 	AppLayout,
 	QuestionsEditModal,
@@ -29,15 +23,12 @@ const Questions = () => {
 
 	const [question, setQuestion] = useState(null);
 	const openEditModal = (id) => {
-		const { data: questions } = queryClient.getQueryData("questions");
+		const { data: questions } = queryClient.getQueryData("/questions");
 		const que = questions.find((que) => que.id === id);
 		setQuestion(que);
 	};
 
-	const { data, isLoading, isFetching, refetch } = useQuestions();
-	const { mutate } = useCreateQuestion();
-	const { mutate: deleteQuestion } = useDeleteQuestion();
-	const { mutate: updateQuestion } = useUpdateQuestion();
+	const { data, isLoading, isFetching, refetch } = useIndex("/questions");
 
 	const toggleModal = () => setVisible(!visible);
 
@@ -50,56 +41,13 @@ const Questions = () => {
 			}
 	};
 
-	const handleCreate = (value, afterCreate) => {
-		mutate(value, {
-			onError: (err) => {
-				message.error(err.response.data.errors.text[0]);
-			},
-			onSuccess: () => {
-				message.success(`New question created!`);
-				afterCreate();
-			},
-		});
-	};
-
-	const handleEdit = (data, afterUpdate) => {
-		updateQuestion(data, {
-			onError: (err) => {
-				const errors = err.response.data.errors;
-
-				Object.keys(errors).forEach((key) => {
-					message.error(errors[key][0]);
-				});
-			},
-			onSuccess: () => {
-				message.success(`The question has been updated!`);
-				afterUpdate();
-			},
-		});
-	};
-
-	const handleDelete = (id) => {
-		deleteQuestion(id, {
-			onSuccess: () => {
-				message.success(`The question has been deleted!`);
-			},
-		});
-	};
-
 	return (
 		<AppLayout>
-			<QuestionsCreateModal
-				visible={visible}
-				handleClose={toggleModal}
-				handleCreate={handleCreate}
+			<QuestionsCreateModal visible={visible} handleClose={toggleModal} />
+			<QuestionsEditModal
+				question={question}
+				handleClose={() => setQuestion(null)}
 			/>
-			{question && (
-				<QuestionsEditModal
-					question={question}
-					handleClose={() => setQuestion(null)}
-					handleEdit={handleEdit}
-				/>
-			)}
 			<Header
 				title="Questions"
 				handleRefresh={refetch}
@@ -108,7 +56,6 @@ const Questions = () => {
 			<QuestionsTable
 				data={!isLoading && data.data}
 				loading={isLoading || isFetching}
-				handleDelete={handleDelete}
 				handleEdit={openEditModal}
 				expandedRowKeys={expandedRowKeys}
 				toggleExpand={toggleExpand}

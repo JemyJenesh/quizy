@@ -1,4 +1,13 @@
-import { Table, Button, Input, Space, Tooltip, Popconfirm, Tag } from "antd";
+import {
+	Table,
+	Button,
+	Input,
+	Space,
+	Tooltip,
+	Popconfirm,
+	Tag,
+	message,
+} from "antd";
 import {
 	EditOutlined,
 	DeleteOutlined,
@@ -6,6 +15,8 @@ import {
 	CaretRightOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import Highlighter from "react-highlight-words";
+import { useDelete } from "api";
 
 const QuestionsTable = ({
 	data,
@@ -13,16 +24,24 @@ const QuestionsTable = ({
 	toggleExpand,
 	expandRow,
 	loading,
-	handleDelete,
 	handleEdit,
 }) => {
 	const expandedText =
 		expandedRowKeys.length > 0 ? "Shrink table rows" : "Expand table rows";
 	const [search, setSearch] = useState("");
+	const [id, setId] = useState(null);
 	const columns = [
 		{
 			title: "Question",
 			dataIndex: "text",
+			render: (text) => (
+				<Highlighter
+					autoEscape
+					highlightClassName="text-highlight"
+					searchWords={[search]}
+					textToHighlight={text}
+				/>
+			),
 		},
 		{
 			title: "Answer",
@@ -38,14 +57,14 @@ const QuestionsTable = ({
 			title: "Actions",
 			dataIndex: "id",
 			align: "right",
-			render: (id) => (
+			render: (rowId) => (
 				<Space>
 					<Tooltip title="edit">
 						<Button
 							type="default"
 							shape="circle"
 							icon={<EditOutlined />}
-							onClick={() => handleEdit(id)}
+							onClick={() => handleEdit(rowId)}
 						/>
 					</Tooltip>
 					<Popconfirm
@@ -53,17 +72,36 @@ const QuestionsTable = ({
 						okText="Yes"
 						placement="topRight"
 						onConfirm={() => {
-							handleDelete(id);
+							handleDelete(rowId);
 						}}
 					>
 						<Tooltip title="delete">
-							<Button shape="circle" danger icon={<DeleteOutlined />}></Button>
+							<Button
+								loading={rowId === id && isLoading}
+								shape="circle"
+								danger
+								icon={<DeleteOutlined />}
+							></Button>
 						</Tooltip>
 					</Popconfirm>
 				</Space>
 			),
 		},
 	];
+	const { mutate, isLoading } = useDelete("/questions");
+
+	const handleDelete = (id) => {
+		setId(id);
+		mutate(id, {
+			onError: (err) => {
+				message.error(err.response.data.message);
+			},
+			onSuccess: () => {
+				message.success(`The question has been deleted!`);
+			},
+			onSettled: () => setId(null),
+		});
+	};
 	return (
 		<div style={{ padding: "1rem 2rem" }}>
 			<div

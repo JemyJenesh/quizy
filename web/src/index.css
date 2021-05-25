@@ -3,3 +3,7 @@
 body {
 	font-family: "Poppins", sans-serif;
 }
+
+.text-highlight {
+	background-color: #ffd63f;
+}

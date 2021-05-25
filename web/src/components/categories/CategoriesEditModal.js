@@ -45,7 +45,7 @@ const CategoriesEditModal = ({ handleClose, category }) => {
 						}}
 					>
 						<Space>
-							<Button onClick={handleClose}>Cancel</Button>
+							<Button onClick={handleCancel}>Cancel</Button>
 							<Button onClick={handleSubmit} type="primary">
 								Update
 							</Button>
