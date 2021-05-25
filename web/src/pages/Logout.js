@@ -21,20 +21,18 @@ const Logout = ({ history }) => {
 				alignItems: "center",
 			}}
 		>
-			{isLoading ? (
-				<Spin />
-			) : (
+			<Spin size="large" spinning={isLoading}>
 				<Card
 					title={
 						<Title level={3} style={{ textAlign: "center", marginBottom: 0 }}>
 							Log out of {config.appName}?
 						</Title>
 					}
-					loading={isLoading}
 					bordered={false}
 					style={{
 						width: 300,
 						textAlign: "center",
+						boxShadow: "5px 8px 24px 5px rgba(208, 216, 243, 0.6)",
 					}}
 				>
 					<Space>
@@ -46,7 +44,7 @@ const Logout = ({ history }) => {
 						</Button>
 					</Space>
 				</Card>
-			)}
+			</Spin>
 		</div>
 	);
 };

@@ -1,8 +1,3 @@
-// categories
-import useCategories from "./categories/useCategories";
-import useCreateCategory from "./categories/useCreateCategory";
-import useDeleteCategory from "./categories/useDeleteCategory";
-import useUpdateCategory from "./categories/useUpdateCategory";
 // questions
 import useCreateQuestion from "./questions/useCreateQuestion";
 import useDeleteQuestion from "./questions/useDeleteQuestion";
@@ -25,11 +20,6 @@ import useCreate from "./useCreate";
 import useUpdate from "./useUpdate";
 
 export {
-	// categories
-	useCategories,
-	useCreateCategory,
-	useDeleteCategory,
-	useUpdateCategory,
 	// questions
 	useQuestions,
 	useCreateQuestion,

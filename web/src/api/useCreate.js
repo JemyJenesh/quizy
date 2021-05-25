@@ -1,9 +1,9 @@
 import { axios } from "utils/axios";
 import { useMutation, useQueryClient } from "react-query";
 
-const useCreate = (url, formData) => {
+const useCreate = (url) => {
 	const queryClient = useQueryClient();
-	const createData = async () => {
+	const createData = async (formData) => {
 		const { data } = await axios.post(url, formData);
 		return data;
 	};

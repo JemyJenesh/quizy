@@ -1,11 +1,11 @@
 import { Checkbox, Form, Input, Modal, Select } from "antd";
-import { useCategories } from "api";
+import { useIndex } from "api";
 import { useEffect, useRef } from "react";
 
 const { Option } = Select;
 
 const QuestionsCreateModal = ({ visible, handleClose, handleCreate }) => {
-	const { data: categories, isLoading } = useCategories();
+	const { data: categories, isLoading } = useIndex("/categories");
 	const [form] = Form.useForm();
 	const inputRef = useRef();
 

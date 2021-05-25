@@ -1,13 +1,23 @@
-import { Table, Button, Input, Space, Tooltip, Popconfirm } from "antd";
+import {
+	Table,
+	Button,
+	Input,
+	Space,
+	Tooltip,
+	Popconfirm,
+	message,
+} from "antd";
 import {
 	EditOutlined,
 	DeleteOutlined,
 	SearchOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
+import { useDelete } from "api";
 
-const CategoriesTable = ({ data, loading, handleDelete, handleEdit }) => {
+const CategoriesTable = ({ data, loading, handleEdit }) => {
 	const [search, setSearch] = useState("");
+	const [id, setId] = useState(null);
 	const columns = [
 		{
 			title: "Name",
@@ -26,14 +36,14 @@ const CategoriesTable = ({ data, loading, handleDelete, handleEdit }) => {
 			title: "Actions",
 			dataIndex: "id",
 			align: "right",
-			render: (id) => (
+			render: (rowId) => (
 				<Space>
 					<Tooltip title="edit">
 						<Button
 							type="default"
 							shape="circle"
 							icon={<EditOutlined />}
-							onClick={() => handleEdit(id)}
+							onClick={() => handleEdit(rowId)}
 						/>
 					</Tooltip>
 					<Popconfirm
@@ -41,17 +51,36 @@ const CategoriesTable = ({ data, loading, handleDelete, handleEdit }) => {
 						okText="Yes"
 						placement="topRight"
 						onConfirm={() => {
-							handleDelete(id);
+							handleDelete(rowId);
 						}}
 					>
 						<Tooltip title="delete">
-							<Button shape="circle" danger icon={<DeleteOutlined />}></Button>
+							<Button
+								shape="circle"
+								loading={rowId === id && isLoading}
+								danger
+								icon={<DeleteOutlined />}
+							></Button>
 						</Tooltip>
 					</Popconfirm>
 				</Space>
 			),
 		},
 	];
+	const { mutate, isLoading } = useDelete("/categories");
+
+	const handleDelete = (id) => {
+		setId(id);
+		mutate(id, {
+			onError: (err) => {
+				message.error(err.response.data.message);
+			},
+			onSuccess: (data) => {
+				message.success(`${data.data.name} has been deleted!`);
+			},
+			onSettled: () => setId(null),
+		});
+	};
 	return (
 		<div style={{ padding: "1rem 2rem" }}>
 			<div
