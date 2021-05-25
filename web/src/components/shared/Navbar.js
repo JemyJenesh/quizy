@@ -1,43 +1,41 @@
-import { Layout, Menu } from "antd";
+import { Menu } from "antd";
 import { DeploymentUnitOutlined } from "@ant-design/icons";
 import { NavLink, useLocation } from "react-router-dom";
-import { routes } from "common";
-
-const { Header } = Layout;
+import { config, routes } from "common";
 
 const Navbar = () => {
 	let location = useLocation();
 
 	return (
-		<Header
+		<Menu
 			style={{
-				width: "100%",
 				display: "flex",
-				justifyContent: "space-between",
-				alignItems: "center",
-				padding: "0 2rem",
+				justifyContent: "flex-end",
 			}}
+			mode="horizontal"
+			defaultSelectedKeys={["/"]}
+			selectedKeys={[location.pathname]}
 		>
-			<NavLink to="/">
-				<DeploymentUnitOutlined style={{ color: "#fff", fontSize: 24 }} />
-			</NavLink>
-			<Menu
-				theme="dark"
-				mode="horizontal"
-				defaultSelectedKeys={["/"]}
-				selectedKeys={[location.pathname]}
+			<Menu.Item
+				key="app"
+				style={{
+					pointerEvents: "none",
+					marginRight: "auto",
+				}}
+				icon={<DeploymentUnitOutlined />}
 			>
-				{routes
-					.filter((route) => !route.auth && route.show)
-					.map(({ path, name, exact }) => (
-						<Menu.Item key={path}>
-							<NavLink to={path} exact={exact}>
-								{name}
-							</NavLink>
-						</Menu.Item>
-					))}
-			</Menu>
-		</Header>
+				{config.appName}
+			</Menu.Item>
+			{routes
+				.filter((route) => !route.auth && route.show)
+				.map(({ path, name, exact }) => (
+					<Menu.Item key={path}>
+						<NavLink to={path} exact={exact}>
+							{name}
+						</NavLink>
+					</Menu.Item>
+				))}
+		</Menu>
 	);
 };
 
