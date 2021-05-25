@@ -1,7 +1,16 @@
-import { Button, Input, message, PageHeader, Table, Tag } from "antd";
+import {
+	Alert,
+	Button,
+	Input,
+	message,
+	PageHeader,
+	Spin,
+	Table,
+	Tag,
+} from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useCreate, useIndex, useShow } from "api";
-import { AppLayout, PageLoader } from "components";
+import { PageLoader } from "components";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
@@ -29,7 +38,7 @@ const QuizQuestions = ({ history }) => {
 	const { data, isLoading } = useShow("/quizzes", id);
 	const { data: questions, isLoading: questionLoading } =
 		useIndex("/questions");
-	const { mutate } = useCreate("/quiz-questions");
+	const { mutate, isLoading: isSaving } = useCreate("/quiz-questions");
 
 	const [selectedRows, setSelectedRows] = useState(
 		data && data.data.quizQuestions.map((d) => d.id)
@@ -63,19 +72,24 @@ const QuizQuestions = ({ history }) => {
 
 	if (isLoading || questionLoading)
 		return (
-			<AppLayout>
+			<>
 				<PageLoader />
-			</AppLayout>
+			</>
 		);
 
 	return (
-		<AppLayout>
+		<Spin spinning={isSaving}>
+			<Alert
+				message="Check mark to include question to the quiz. Uncheck to remove."
+				banner
+				type="info"
+			/>
 			<PageHeader
 				title={data.data.name}
 				subTitle={data.data.description}
 				onBack={() => history.goBack()}
 				extra={[
-					<Button type="primary" onClick={handleSave}>
+					<Button key="save" type="primary" onClick={handleSave}>
 						Save
 					</Button>,
 				]}
@@ -104,7 +118,7 @@ const QuizQuestions = ({ history }) => {
 					pagination={false}
 				/>
 			</div>
-		</AppLayout>
+		</Spin>
 	);
 };
 

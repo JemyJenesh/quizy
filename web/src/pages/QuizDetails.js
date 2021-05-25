@@ -1,7 +1,7 @@
 import { Button, PageHeader, Tooltip } from "antd";
 import { PaperClipOutlined } from "@ant-design/icons";
 import { useShow } from "api";
-import { AppLayout, PageLoader, QuizQuestionsTable } from "components";
+import { PageLoader, QuizQuestionsTable } from "components";
 import { useState } from "react";
 import { useParams } from "react-router";
 
@@ -26,13 +26,13 @@ const QuizDetails = ({ history }) => {
 
 	if (isLoading)
 		return (
-			<AppLayout>
+			<>
 				<PageLoader />
-			</AppLayout>
+			</>
 		);
 
 	return (
-		<AppLayout>
+		<>
 			<PageHeader
 				title={data.data.name}
 				subTitle={data.data.description}
@@ -56,7 +56,7 @@ const QuizDetails = ({ history }) => {
 				toggleExpand={toggleExpand}
 				expandRow={expandRow}
 			/>
-		</AppLayout>
+		</>
 	);
 };
 

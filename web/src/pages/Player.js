@@ -150,7 +150,7 @@ const Player = ({ history }) => {
 	}, [quizId]);
 
 	useEffect(() => {
-		if (quiz && player) setIsTurn(quiz.turn == player.order);
+		if (quiz && player) setIsTurn(quiz.turn === player.order);
 	}, [quiz, player]);
 
 	return (

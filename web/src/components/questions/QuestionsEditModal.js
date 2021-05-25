@@ -10,7 +10,7 @@ import {
 	Spin,
 } from "antd";
 import { useIndex, useUpdate } from "api";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const { Option } = Select;
 
@@ -54,7 +54,7 @@ const QuestionsEditModal = ({ handleClose, question }) => {
 
 	useEffect(() => {
 		form.resetFields();
-	}, [question]);
+	}, [question, form]);
 
 	return (
 		<Drawer
