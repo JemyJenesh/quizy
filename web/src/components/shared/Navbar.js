@@ -11,6 +11,9 @@ const Navbar = () => {
 			style={{
 				display: "flex",
 				justifyContent: "flex-end",
+				position: "sticky",
+				top: 0,
+				zIndex: 2000,
 			}}
 			mode="horizontal"
 			defaultSelectedKeys={["/"]}

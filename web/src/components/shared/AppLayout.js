@@ -1,24 +1,17 @@
 import { Layout } from "antd";
 import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
-import { useSelector } from "react-redux";
-import { selectUser } from "store/authSlice";
 
 const { Content } = Layout;
 
 const AppLayout = ({ children }) => {
-	const user = useSelector(selectUser);
-
 	return (
 		<Layout>
-			{!user ? <Navbar /> : <Sidebar />}
-
+			<Sidebar />
 			<Content
 				style={{
 					backgroundColor: "white",
 					position: "relative",
-					// marginTop: show ? 64 : 0,
-					minHeight: !user ? "calc(100vh - 64px)" : "100vh",
+					minHeight: "100vh",
 				}}
 			>
 				{children}

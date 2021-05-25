@@ -21,10 +21,11 @@ import QuizQuestionsTable from "./quizzes/QuizQuestionsTable";
 // players
 import PlayersList from "./players/PlayersList";
 import PlayerInfo from "./players/PlayerInfo";
-
+import GuestLayout from "./shared/GuestLayout";
 export {
 	// shared
 	AppLayout,
+	GuestLayout,
 	AuthRoute,
 	GuestRoute,
 	AppLoader,
