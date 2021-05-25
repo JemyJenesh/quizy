@@ -16,6 +16,7 @@ const Header = ({
 	handleCreate,
 	handleUpload,
 	extra = [],
+	showIcon = true,
 }) => {
 	const dispatch = useDispatch();
 	const handleToggle = () => dispatch(toggleSidebar());
@@ -31,7 +32,7 @@ const Header = ({
 				zIndex: 2,
 			}}
 			onBack={handleToggle}
-			backIcon={<MenuOutlined />}
+			backIcon={showIcon ? <MenuOutlined /> : null}
 			title={title}
 			subTitle={subTitle}
 			extra={[

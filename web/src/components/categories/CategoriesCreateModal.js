@@ -1,10 +1,13 @@
-import { Form, Input, Modal } from "antd";
-import { useEffect, useRef } from "react";
+import { Drawer, Form, Input, Button, Space } from "antd";
+import { useRef } from "react";
 
 const CategoriesCreateModal = ({ visible, handleClose, handleCreate }) => {
 	const formRef = useRef();
 	const inputRef = useRef();
 
+	const focusFirstInput = (visible) => {
+		if (visible) inputRef.current.focus();
+	};
 	const handleSubmit = () => {
 		formRef.current.submit();
 	};
@@ -13,22 +16,31 @@ const CategoriesCreateModal = ({ visible, handleClose, handleCreate }) => {
 		handleClose();
 	};
 
-	useEffect(() => {
-		let timer;
-		if (visible) {
-			timer = setTimeout(() => {
-				inputRef.current.focus();
-			}, 10);
-		}
-		return () => clearTimeout(timer);
-	}, [visible]);
-
 	return (
-		<Modal
+		<Drawer
 			title="Create category"
 			visible={visible}
-			onCancel={handleCancel}
-			onOk={handleSubmit}
+			closable={false}
+			destroyOnClose
+			width={300}
+			footer={
+				<div
+					style={{
+						textAlign: "right",
+					}}
+				>
+					<Space>
+						<Button onClick={handleClose}>Cancel</Button>
+						<Button onClick={handleSubmit} type="primary">
+							Create
+						</Button>
+					</Space>
+				</div>
+			}
+			footerStyle={{
+				padding: ".5rem 1.5rem",
+			}}
+			afterVisibleChange={focusFirstInput}
 		>
 			<Form
 				name="create_category"
@@ -59,7 +71,7 @@ const CategoriesCreateModal = ({ visible, handleClose, handleCreate }) => {
 					<Input placeholder="Short description" />
 				</Form.Item>
 			</Form>
-		</Modal>
+		</Drawer>
 	);
 };
 

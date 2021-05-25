@@ -4,8 +4,7 @@ import { Route, Redirect } from "react-router";
 import { config } from "common";
 import { AppLoader } from "components";
 
-const GuestRoute = ({ route }) => {
-	const { name, component: Component, path } = route;
+const GuestRoute = ({ name, component: Component, path }) => {
 	const user = useSelector(selectUser);
 	const isAppLoading = useSelector(selectIsAppLoading);
 

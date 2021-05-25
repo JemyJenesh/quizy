@@ -41,16 +41,12 @@ const Game = ({ history }) => {
 		}
 	}, [data, category]);
 
-	if (isLoading)
-		return (
-			<AppLayout>
-				<PageLoader />
-			</AppLayout>
-		);
+	if (isLoading) return <PageLoader />;
 
 	return (
-		<AppLayout>
+		<div>
 			<Header
+				showIcon={false}
 				title={data.data.name}
 				subTitle={data.data.pin}
 				extra={[
@@ -146,7 +142,7 @@ const Game = ({ history }) => {
 					</Col>
 				</Row>
 			</div>
-		</AppLayout>
+		</div>
 	);
 };
 

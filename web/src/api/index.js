@@ -18,6 +18,11 @@ import useCreateQuizQuestions from "./quizzes/useCreateQuizQuestions";
 import useGame from "./games/useGame";
 import useCreateGame from "./games/useCreateGame";
 import useDeleteGame from "./games/useDeleteGame";
+import useIndex from "./useIndex";
+import useShow from "./useShow";
+import useDelete from "./useDelete";
+import useCreate from "./useCreate";
+import useUpdate from "./useUpdate";
 
 export {
 	// categories
@@ -41,4 +46,10 @@ export {
 	useGame,
 	useCreateGame,
 	useDeleteGame,
+	// api
+	useIndex,
+	useShow,
+	useDelete,
+	useCreate,
+	useUpdate,
 };

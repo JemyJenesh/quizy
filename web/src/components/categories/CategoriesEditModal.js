@@ -1,10 +1,13 @@
-import { Form, Input, Modal } from "antd";
-import { useEffect, useRef } from "react";
+import { Form, Input, Drawer, Button, Space } from "antd";
+import { useRef } from "react";
 
 const CategoriesEditModal = ({ handleClose, handleEdit, category }) => {
 	const formRef = useRef();
 	const inputRef = useRef();
 
+	const focusFirstInput = (visible) => {
+		if (visible) inputRef.current.focus();
+	};
 	const handleSubmit = () => {
 		formRef.current.submit();
 	};
@@ -13,22 +16,31 @@ const CategoriesEditModal = ({ handleClose, handleEdit, category }) => {
 		handleClose(null);
 	};
 
-	useEffect(() => {
-		let timer;
-		if (category) {
-			timer = setTimeout(() => {
-				inputRef.current.focus();
-			}, 10);
-		}
-		return () => clearTimeout(timer);
-	}, [category]);
-
 	return (
-		<Modal
+		<Drawer
 			title="Edit category"
 			visible={!!category}
-			onCancel={handleCancel}
-			onOk={handleSubmit}
+			closable={false}
+			destroyOnClose
+			width={300}
+			footer={
+				<div
+					style={{
+						textAlign: "right",
+					}}
+				>
+					<Space>
+						<Button onClick={handleClose}>Cancel</Button>
+						<Button onClick={handleSubmit} type="primary">
+							Update
+						</Button>
+					</Space>
+				</div>
+			}
+			footerStyle={{
+				padding: ".5rem 1.5rem",
+			}}
+			afterVisibleChange={focusFirstInput}
 		>
 			<Form
 				name="edit_category"
@@ -62,7 +74,7 @@ const CategoriesEditModal = ({ handleClose, handleEdit, category }) => {
 					<Input placeholder="Short description" />
 				</Form.Item>
 			</Form>
-		</Modal>
+		</Drawer>
 	);
 };
 

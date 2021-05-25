@@ -1,5 +1,5 @@
 const config = {
-	appName: "My App",
+	appName: "Quizy",
 	homeRoute: "/categories",
 };
 

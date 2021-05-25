@@ -22,12 +22,17 @@ const Sidebar = () => {
 			trigger={null}
 			collapsed={open}
 			collapsible
+			theme="light"
 		>
-			<Menu theme="dark" mode="inline" defaultSelectedKeys={location.pathname}>
+			<Menu
+				mode="inline"
+				defaultSelectedKeys={location.pathname}
+				style={{ height: "100vh" }}
+			>
 				<Menu.Item
 					key="app"
 					style={{ pointerEvents: "none" }}
-					icon={<DeploymentUnitOutlined style={{ color: "#fff" }} />}
+					icon={<DeploymentUnitOutlined />}
 				>
 					{config.appName}
 				</Menu.Item>

@@ -1,35 +1,45 @@
 import { useEffect } from "react";
-import { routes } from "common";
+import { config, routes } from "common";
 import { AuthRoute, GuestRoute } from "components";
 import { useDispatch } from "react-redux";
 import { checkAuth } from "store/authSlice";
-import { QueryClient, QueryClientProvider } from "react-query";
-
-const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			retry: 1,
-			refetchOnWindowFocus: false,
-		},
-	},
-});
+import { Route, Switch, useHistory } from "react-router";
+import { Result, Button } from "antd";
 
 function App() {
+	const history = useHistory();
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch(checkAuth());
 	}, [dispatch]);
 
 	return (
-		<QueryClientProvider client={queryClient}>
+		<Switch>
 			{routes.map((route) =>
 				route.auth ? (
-					<AuthRoute key={route.name} route={route} />
+					<AuthRoute key={route.name} {...route} />
 				) : (
-					<GuestRoute key={route.name} route={route} />
+					<GuestRoute key={route.name} {...route} />
 				)
 			)}
-		</QueryClientProvider>
+			<Route
+				render={() => (
+					<Result
+						status="404"
+						title="404"
+						subTitle="Sorry, the page you visited does not exist."
+						extra={
+							<Button
+								type="primary"
+								onClick={() => history.push(config.homeRoute)}
+							>
+								Back Home
+							</Button>
+						}
+					/>
+				)}
+			/>
+		</Switch>
 	);
 }
 

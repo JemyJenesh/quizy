@@ -75,13 +75,11 @@ const Categories = () => {
 				handleClose={toggleModal}
 				handleCreate={handleCreate}
 			/>
-			{category && (
-				<CategoriesEditModal
-					category={category}
-					handleClose={() => setCategory(null)}
-					handleEdit={handleEdit}
-				/>
-			)}
+			<CategoriesEditModal
+				category={category}
+				handleClose={() => setCategory(null)}
+				handleEdit={handleEdit}
+			/>
 			<Header
 				title="Categories"
 				handleRefresh={refetch}

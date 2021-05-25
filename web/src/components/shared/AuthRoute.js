@@ -3,8 +3,7 @@ import { selectIsAppLoading, selectUser } from "store/authSlice";
 import { Route, Redirect } from "react-router";
 import { AppLoader } from "components";
 
-const AuthRoute = ({ route }) => {
-	const { name, component: Component, path } = route;
+const AuthRoute = ({ name, component: Component, path }) => {
 	const user = useSelector(selectUser);
 	const isAppLoading = useSelector(selectIsAppLoading);
 
