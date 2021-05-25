@@ -1,8 +1,8 @@
 import { Button, Input, message, PageHeader, Table, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { useCreateQuizQuestions, useQuestions, useQuiz } from "api";
+import { useCreate, useIndex, useShow } from "api";
 import { AppLayout, PageLoader } from "components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 const columns = [
@@ -26,9 +26,10 @@ const columns = [
 const QuizQuestions = ({ history }) => {
 	const { id } = useParams();
 	const [search, setSearch] = useState("");
-	const { data: questions, isLoading: questionLoading } = useQuestions();
-	const { data, isLoading } = useQuiz(id);
-	const { mutate } = useCreateQuizQuestions();
+	const { data, isLoading } = useShow("/quizzes", id);
+	const { data: questions, isLoading: questionLoading } =
+		useIndex("/questions");
+	const { mutate } = useCreate("/quiz-questions");
 
 	const [selectedRows, setSelectedRows] = useState(
 		data && data.data.quizQuestions.map((d) => d.id)
@@ -56,7 +57,11 @@ const QuizQuestions = ({ history }) => {
 		);
 	};
 
-	if (isLoading)
+	useEffect(() => {
+		data && setSelectedRows(data.data.quizQuestions.map((d) => d.id));
+	}, [data]);
+
+	if (isLoading || questionLoading)
 		return (
 			<AppLayout>
 				<PageLoader />

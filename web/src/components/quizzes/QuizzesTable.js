@@ -1,4 +1,12 @@
-import { Table, Button, Input, Space, Tooltip, Popconfirm } from "antd";
+import {
+	Table,
+	Button,
+	Input,
+	Space,
+	Tooltip,
+	Popconfirm,
+	message,
+} from "antd";
 import {
 	EditOutlined,
 	DeleteOutlined,
@@ -8,16 +16,17 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import Highlighter from "react-highlight-words";
+import { useDelete } from "api";
 
 const QuizzesTable = ({
 	data,
 	loading,
-	handleDelete,
 	handleEdit,
 	handleDetail,
 	handleHosting,
 }) => {
 	const [search, setSearch] = useState("");
+	const [id, setId] = useState(null);
 	const columns = [
 		{
 			title: "Name",
@@ -44,14 +53,14 @@ const QuizzesTable = ({
 			title: "Actions",
 			dataIndex: "id",
 			align: "right",
-			render: (id) => (
+			render: (rowId) => (
 				<Space>
 					<Tooltip title="Host">
 						<Button
 							type="default"
 							shape="circle"
 							icon={<WifiOutlined />}
-							onClick={() => handleHosting(id)}
+							onClick={() => handleHosting(rowId)}
 						/>
 					</Tooltip>
 					<Tooltip title="View">
@@ -59,7 +68,7 @@ const QuizzesTable = ({
 							type="default"
 							shape="circle"
 							icon={<EyeOutlined />}
-							onClick={() => handleDetail(id)}
+							onClick={() => handleDetail(rowId)}
 						/>
 					</Tooltip>
 					<Tooltip title="edit">
@@ -67,7 +76,7 @@ const QuizzesTable = ({
 							type="default"
 							shape="circle"
 							icon={<EditOutlined />}
-							onClick={() => handleEdit(id)}
+							onClick={() => handleEdit(rowId)}
 						/>
 					</Tooltip>
 					<Popconfirm
@@ -75,17 +84,38 @@ const QuizzesTable = ({
 						okText="Yes"
 						placement="topRight"
 						onConfirm={() => {
-							handleDelete(id);
+							handleDelete(rowId);
 						}}
 					>
 						<Tooltip title="delete">
-							<Button shape="circle" danger icon={<DeleteOutlined />}></Button>
+							<Button
+								loading={rowId === id && isLoading}
+								shape="circle"
+								danger
+								icon={<DeleteOutlined />}
+							></Button>
 						</Tooltip>
 					</Popconfirm>
 				</Space>
 			),
 		},
 	];
+
+	const { mutate, isLoading } = useDelete("/quizzes");
+
+	const handleDelete = (id) => {
+		setId(id);
+		mutate(id, {
+			onError: (err) => {
+				message.error(err.response.data.message);
+			},
+			onSuccess: (data) => {
+				message.success(`${data.data.name} has been deleted!`);
+			},
+			onSettled: () => setId(null),
+		});
+	};
+
 	return (
 		<div style={{ padding: "1rem 2rem" }}>
 			<div

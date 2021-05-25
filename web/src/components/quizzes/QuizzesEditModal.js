@@ -1,10 +1,16 @@
-import { Form, Input, Modal } from "antd";
-import { useEffect, useRef } from "react";
+import { Button, Drawer, Form, Input, message, Space, Spin } from "antd";
+import { useUpdate } from "api";
+import { useRef } from "react";
 
-const QuizzesEditModal = ({ handleClose, handleEdit, quiz }) => {
+const QuizzesEditModal = ({ handleClose, quiz }) => {
 	const formRef = useRef();
 	const inputRef = useRef();
 
+	const { mutate, isLoading } = useUpdate("/quizzes", quiz?.id);
+
+	const focusFirstInput = (visible) => {
+		if (visible) inputRef.current.focus();
+	};
 	const handleSubmit = () => {
 		formRef.current.submit();
 	};
@@ -13,56 +19,79 @@ const QuizzesEditModal = ({ handleClose, handleEdit, quiz }) => {
 		handleClose(null);
 	};
 
-	useEffect(() => {
-		let timer;
-		if (quiz) {
-			timer = setTimeout(() => {
-				inputRef.current.focus();
-			}, 10);
-		}
-		return () => clearTimeout(timer);
-	}, [quiz]);
+	const handleOnFinish = (values) => {
+		mutate(values, {
+			onError: (err) => {
+				message.error(err.response.data.errors.name[0]);
+			},
+			onSuccess: (data) => {
+				message.success(`${data.data.name} has been updated!`);
+				handleCancel();
+			},
+		});
+	};
 
 	return (
-		<Modal
+		<Drawer
 			title="Edit quiz"
 			visible={!!quiz}
-			onCancel={handleCancel}
-			onOk={handleSubmit}
+			closable={false}
+			destroyOnClose
+			width={300}
+			footer={
+				<Spin spinning={isLoading}>
+					<div
+						style={{
+							textAlign: "right",
+						}}
+					>
+						<Space>
+							<Button onClick={handleCancel}>Cancel</Button>
+							<Button onClick={handleSubmit} type="primary">
+								Update
+							</Button>
+						</Space>
+					</div>
+				</Spin>
+			}
+			footerStyle={{
+				padding: ".5rem 1.5rem",
+			}}
+			afterVisibleChange={focusFirstInput}
 		>
-			<Form
-				name="edit_quiz"
-				onFinish={(values) =>
-					handleEdit({ id: quiz.id, data: values }, handleCancel)
-				}
-				ref={formRef}
-				initialValues={quiz}
-			>
-				<Form.Item
-					name="name"
-					rules={[
-						{
-							required: true,
-							message: "Please enter a name!",
-						},
-					]}
+			<Spin spinning={isLoading}>
+				<Form
+					name="edit_quiz"
+					onFinish={handleOnFinish}
+					ref={formRef}
+					initialValues={quiz}
 				>
-					<Input placeholder="Name" ref={inputRef} />
-				</Form.Item>
+					<Form.Item
+						name="name"
+						rules={[
+							{
+								required: true,
+								message: "Please enter a name!",
+							},
+						]}
+					>
+						<Input placeholder="Name" ref={inputRef} />
+					</Form.Item>
 
-				<Form.Item
-					name="description"
-					rules={[
-						{
-							required: true,
-							message: "Please enter a short description!",
-						},
-					]}
-				>
-					<Input placeholder="Short description" />
-				</Form.Item>
-			</Form>
-		</Modal>
+					<Form.Item
+						name="description"
+						rules={[
+							{
+								required: true,
+								message: "Please enter a short description!",
+							},
+						]}
+					>
+						<Input placeholder="Short description" />
+					</Form.Item>
+				</Form>
+			</Spin>
+		</Drawer>
 	);
 };
 

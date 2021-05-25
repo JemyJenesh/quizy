@@ -1,13 +1,13 @@
 import { Button, PageHeader, Tooltip } from "antd";
 import { PaperClipOutlined } from "@ant-design/icons";
-import { useQuiz } from "api";
+import { useShow } from "api";
 import { AppLayout, PageLoader, QuizQuestionsTable } from "components";
 import { useState } from "react";
 import { useParams } from "react-router";
 
 const QuizDetails = ({ history }) => {
 	const { id } = useParams();
-	const { data, isLoading } = useQuiz(id);
+	const { data, isLoading } = useShow("/quizzes", id);
 	const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
 	const expandRow = (key) => {
