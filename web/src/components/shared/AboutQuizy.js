@@ -22,7 +22,11 @@ const gridStyle = {
 const AboutQuizy = () => {
 	return (
 		<>
-			<Col span={8} style={{ padding: "2rem" }}>
+			<Col
+				xs={{ span: 24, order: 2 }}
+				lg={{ span: 8, order: 1 }}
+				style={{ padding: "2rem" }}
+			>
 				<Card.Grid style={gridStyle}>
 					<Typography.Title level={2}>About Quizy</Typography.Title>
 					<Typography.Text>
@@ -50,7 +54,11 @@ const AboutQuizy = () => {
 					</Typography.Text>
 				</Card.Grid>
 			</Col>
-			<Col span={8} style={{ padding: "2rem" }}>
+			<Col
+				xs={{ span: 24, order: 3 }}
+				lg={{ span: 8, order: 2 }}
+				style={{ padding: "2rem" }}
+			>
 				<Timeline>
 					<Timeline.Item
 						color="green"

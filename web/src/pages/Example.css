@@ -1,0 +1,28 @@
+.tag {
+	font-size: 1.1rem;
+	padding: 0.75rem 1rem;
+	width: 100%;
+}
+
+.space-between {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.title {
+	margin: 0;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.score {
+	color: #52c41a;
+	height: 1.5rem;
+	line-height: 1.5rem;
+	font-size: 1rem;
+	background-color: #fff;
+	box-shadow: 0 0 0 1px #d9d9d9 inset;
+}

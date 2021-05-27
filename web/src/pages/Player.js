@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { SmileOutlined } from "@ant-design/icons";
+import {
+	SmileOutlined,
+	CheckCircleOutlined,
+	SyncOutlined,
+	CloseCircleOutlined,
+	UnorderedListOutlined,
+} from "@ant-design/icons";
 import {
 	Row,
 	Col,
@@ -10,16 +16,22 @@ import {
 	Space,
 	Result,
 	message,
+	Badge,
+	Divider,
+	Drawer,
 } from "antd";
 import { PlayerInfo, PlayersList } from "components";
 import { useParams } from "react-router";
 import { axios } from "utils/axios";
 import echo from "utils/echo";
 
+import "./Example.css";
+
 const { CheckableTag } = Tag;
 
 const COUNTDOWN = 20;
 const PASS_COUNTDOWN = 10;
+const returnIndexToAlphabhet = (index) => ["A", "B", "C", "D"][index];
 
 const Player = ({ history }) => {
 	const timer = useRef();
@@ -33,8 +45,11 @@ const Player = ({ history }) => {
 	const [answered, setAnswered] = useState(false);
 	const [isTurn, setIsTurn] = useState(false);
 	const [time, setTime] = useState(0);
+	const [submitting, setSubmitting] = useState(false);
+	const [drawerVisible, setDrawerVisible] = useState(false);
 
 	const submit = () => {
+		setSubmitting(true);
 		clearInterval(timer.current);
 		setTime(0);
 		axios
@@ -46,8 +61,11 @@ const Player = ({ history }) => {
 				if (err.response) {
 					message.error("Something went wrong!");
 				}
+			})
+			.finally(() => {
+				setSubmitting(false);
+				setAnswered(true);
 			});
-		setAnswered(true);
 	};
 
 	const handleSubmit = () => {
@@ -152,6 +170,192 @@ const Player = ({ history }) => {
 	useEffect(() => {
 		if (quiz && player) setIsTurn(quiz.turn === player.order);
 	}, [quiz, player]);
+
+	return (
+		<div style={{ minHeight: "100vh" }}>
+			<Drawer
+				title="Scoreboard"
+				placement="bottom"
+				onClose={() => setDrawerVisible(!drawerVisible)}
+				visible={drawerVisible}
+				height="100%"
+			>
+				<PlayersList quizId={quizId} turn={quiz && quiz.turn} />
+			</Drawer>
+			<div className="container">
+				<Row>
+					{question ? (
+						<>
+							<Col flex={1}>
+								<Progress
+									percent={
+										100 -
+										(((quiz.is_passed ? PASS_COUNTDOWN : COUNTDOWN) - time) /
+											(quiz.is_passed ? PASS_COUNTDOWN : COUNTDOWN)) *
+											100
+									}
+									showInfo={false}
+									size="small"
+								/>
+							</Col>
+							<Col flex={0}>
+								<Typography.Title
+									level={5}
+									style={{ width: "2.5rem", textAlign: "end", margin: 0 }}
+								>
+									{time}s
+								</Typography.Title>
+							</Col>
+						</>
+					) : (
+						<Col xs={24}>
+							<Typography.Title
+								level={1}
+								className="text-center"
+								style={{ margin: 0 }}
+							>
+								Waiting...
+							</Typography.Title>
+						</Col>
+					)}
+				</Row>
+			</div>
+			<Divider className="title" />
+			<div className="container">
+				<Row>
+					<Col xs={0} lg={8}></Col>
+					<Col xs={24} lg={16}>
+						<Space direction="vertical" size="large" style={{ width: "100%" }}>
+							<Row align="middle">
+								<Col flex={0}>
+									<Badge count={quiz?.players_count} showZero>
+										<Button
+											size="large"
+											shape="circle"
+											onClick={() => setDrawerVisible(true)}
+											icon={
+												<UnorderedListOutlined style={{ color: "#2db7f5" }} />
+											}
+										/>
+									</Badge>
+								</Col>
+								<Col flex={1}>
+									<Typography.Title
+										type="secondary"
+										level={3}
+										className="title text-center"
+									>
+										{player?.name}
+									</Typography.Title>
+								</Col>
+								<Col flex={0}>
+									<Badge
+										count={player?.score}
+										overflowCount={999}
+										className="score"
+										showZero
+									/>
+								</Col>
+							</Row>
+							<Row justify="space-between" gutter={[24, 24]}>
+								{ended ? (
+									<Result
+										icon={<SmileOutlined />}
+										title="Thanks for participating in the quiz!"
+									/>
+								) : (
+									question && (
+										<>
+											<Col xs={24}>
+												<Typography.Title
+													level={3}
+													className="title text-center"
+												>
+													{question?.text}
+												</Typography.Title>
+											</Col>
+											{question?.options.map((option, idx) => (
+												<Col key={option.id} xs={24} md={12}>
+													<Tag
+														className="tag"
+														icon={
+															answer === option.id &&
+															submitting && <SyncOutlined spin />
+														}
+														color={
+															answer === option.id ? "processing" : "default"
+														}
+														onClick={() =>
+															!answered &&
+															time > 0 &&
+															setAnswer(answer === option.id ? null : option.id)
+														}
+													>
+														{returnIndexToAlphabhet(idx)}. {option.text}
+													</Tag>
+												</Col>
+											))}
+											{quiz.turn === player.order && (
+												<>
+													<Col flex="0">
+														<Button
+															size="large"
+															disabled={time < 1 || answered}
+															onClick={handlePass}
+														>
+															Pass
+														</Button>
+													</Col>
+													<Col flex="0">
+														<Button
+															size="large"
+															type="primary"
+															disabled={time < 1 || answered}
+															size="large"
+															onClick={handleSubmit}
+														>
+															Submit
+														</Button>
+													</Col>
+												</>
+											)}
+										</>
+									)
+								)}
+								{/* <Col xs={24} md={12}>
+										<Tag
+											className="tag"
+											icon={<CheckCircleOutlined />}
+											color="success"
+										>
+											B. Kathmandu
+										</Tag>
+									</Col>
+									<Col xs={24} md={12}>
+										<Tag
+											className="tag"
+											icon={<SyncOutlined spin />}
+											color="processing"
+										>
+											C. Hetauda
+										</Tag>
+									</Col>
+									<Col xs={24} md={12}>
+										<Tag
+											className="tag"
+											icon={<CloseCircleOutlined />}
+											color="error"
+										>
+											D. Pokhara
+										</Tag>
+									</Col> */}
+							</Row>
+						</Space>
+					</Col>
+				</Row>
+			</div>
+		</div>
+	);
 
 	return (
 		<div style={styles.container}>

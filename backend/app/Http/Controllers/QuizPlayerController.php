@@ -23,7 +23,7 @@ class QuizPlayerController extends Controller {
   }
 
   public function show(Player $player) {
-    $quiz = $player->quiz;
+    $quiz = $player->quiz()->withCount('players')->first();
     $question = $player->quiz->question ? new QuestionResource($player->quiz->question) : null;
     return response(compact('quiz', 'player', 'question'));
   }

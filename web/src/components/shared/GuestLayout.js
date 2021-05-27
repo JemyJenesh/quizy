@@ -17,10 +17,11 @@ const GuestLayout = ({ children }) => {
 				<Row>
 					<AboutQuizy />
 					<Col
-						span={8}
+						xs={{ span: 24, order: 1 }}
+						lg={{ span: 8, order: 3 }}
 						style={{
-							position: "sticky",
-							top: 48,
+							// position: "sticky",
+							// top: 48,
 							height: "calc(100vh - 49px)",
 							backgroundColor: "#fafafa",
 							padding: "2rem 0",
