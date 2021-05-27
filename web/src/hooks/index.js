@@ -1,4 +1,4 @@
-import usePlayerRealtime from "./usePlayerRealtime";
+import usePlayersRealtime from "./usePlayersRealtime";
 import useQuizRealtime from "./useQuizRealtime";
 
-export { usePlayerRealtime, useQuizRealtime };
+export { usePlayersRealtime, useQuizRealtime };

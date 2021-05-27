@@ -53,7 +53,7 @@ const Player = ({ history }) => {
 		clearInterval(timer.current);
 		setTime(0);
 		axios
-			.post("/answers", {
+			.post("/answer", {
 				option_id: answer,
 				player_id: playerId,
 			})

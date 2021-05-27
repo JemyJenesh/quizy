@@ -7,6 +7,7 @@ use App\Events\QuestionChanged;
 use App\Events\QuestionPassed;
 use App\Events\QuestionPassingEnd;
 use App\Events\QuizEnded;
+use App\Http\Resources\GameQuizDetailResource;
 use App\Http\Resources\GameQuizResource;
 use App\Models\Option;
 use App\Models\Player;
@@ -15,7 +16,7 @@ use Illuminate\Http\Request;
 
 class GameController extends Controller {
   public function __construct() {
-    $this->middleware('auth:sanctum')->except(['answer', 'pass']);
+    $this->middleware('auth:sanctum')->except(['answer', 'pass', 'show']);
   }
 
   /**
@@ -58,6 +59,11 @@ class GameController extends Controller {
   public function show($quiz) {
     $quiz = Quiz::find($quiz);
     return new GameQuizResource($quiz);
+  }
+
+  public function showForHost($quiz) {
+    $quiz = Quiz::find($quiz);
+    return new GameQuizDetailResource($quiz);
   }
 
   /**

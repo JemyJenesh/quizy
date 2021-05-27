@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { axios } from "utils/axios";
 import echo from "utils/echo";
 
-const usePlayerRealtime = (quizId, playerId = null) => {
+const usePlayersRealtime = (quizId, playerId = null) => {
 	const [players, setPlayers] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isKicking, setIsKicking] = useState(false);
@@ -76,4 +76,4 @@ const usePlayerRealtime = (quizId, playerId = null) => {
 	return { players, isLoading, kickPlayer, isKicking };
 };
 
-export default usePlayerRealtime;
+export default usePlayersRealtime;

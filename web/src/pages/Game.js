@@ -5,6 +5,7 @@ import { Header, PageLoader, PlayersList } from "components";
 import { useParams } from "react-router";
 import Checkbox from "antd/lib/checkbox/Checkbox";
 import { axios } from "utils/axios";
+import { useQuery } from "react-query";
 
 const { Option } = Select;
 
@@ -14,7 +15,10 @@ const Game = ({ history }) => {
 	const [category, setCategory] = useState(null);
 	const [loading, setLoading] = useState(false);
 
-	const { data, isLoading, refetch } = useShow("/games", id);
+	const { data, isLoading, refetch } = useQuery(["game", id], async () => {
+		const { data } = await axios(`/games/${id}/host`);
+		return data;
+	});
 	const { mutate, isLoading: isEnding } = useDelete("/games");
 
 	const endQuiz = () => {

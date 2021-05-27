@@ -33,10 +33,12 @@ Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('questions', QuestionController::class);
 Route::apiResource('quizzes', QuizController::class);
-Route::apiResource('quiz-questions', QuizQuestionController::class);
+Route::apiResource('quiz-questions', QuizQuestionController::class)->only('store');
+
+Route::get('games/{id}/host', [GameController::class, 'showForHost']);
 Route::apiResource('games', GameController::class);
+
 Route::apiResource('quizzes.players', QuizPlayerController::class)->only(['index']);
 Route::apiResource('players', QuizPlayerController::class)->only(['store', 'destroy', 'show']);
-
-Route::post('/answers', [GameController::class, 'answer']);
+Route::post('/answer', [GameController::class, 'answer']);
 Route::post('/pass', [GameController::class, 'pass']);
