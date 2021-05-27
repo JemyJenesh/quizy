@@ -141,11 +141,11 @@ class GameController extends Controller {
 
     if ($isCorrect) {
       $player->update([
-        'score' => $player->score + $player->quiz->is_passed ? 5 : 10,
+        'score' => $player->score + ($player->quiz->is_passed ? 5 : 10),
       ]);
     } else {
       $player->update([
-        'score' => $player->score - 2,
+        'score' => $player->score - ($player->quiz->is_passed ? 0 : 2),
       ]);
     }
 
@@ -163,7 +163,7 @@ class GameController extends Controller {
     $player = Player::find($request->player_id);
     $nextTurn = ($player->quiz->turn % $player->quiz->players->count()) + 1;
 
-    if ($player->quiz->pass === $nextTurn) {
+    if ($player->quiz->pass == $nextTurn) {
       QuestionPassingEnd::dispatch($player->quiz);
       return response(null, 200);
     }

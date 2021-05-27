@@ -1,7 +1,7 @@
 import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 
-// window.Pusher = Pusher;
+window.Pusher = Pusher;
 
 const options = {
 	broadcaster: "pusher",
