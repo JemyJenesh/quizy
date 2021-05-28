@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { message, notification } from "antd";
 import { useEffect, useState } from "react";
 import { axios } from "utils/axios";
 import echo from "utils/echo";
@@ -65,6 +65,23 @@ const usePlayersRealtime = (quizId, playerId = null) => {
 				setPlayers((prev) =>
 					prev.filter((player) => player.id !== kickedPlayer.id)
 				);
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
+				if (e.correct === null) {
+					notification.warning({
+						message: "Time's Up!",
+					});
+				} else if (e.correct) {
+					notification.success({
+						message: "Correct Answer!",
+					});
+				} else {
+					notification.error({
+						message: "Wrong Answer!",
+					});
+				}
+				setPlayers(e.players.sort((a, b) => b.score - a.score));
 			});
 
 			return () => {
