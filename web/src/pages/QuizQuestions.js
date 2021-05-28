@@ -13,24 +13,7 @@ import { useCreate, useIndex, useShow } from "api";
 import { PageLoader } from "components";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-
-const columns = [
-	{
-		title: "Question",
-		dataIndex: "text",
-		width: "60%",
-	},
-	{
-		title: "Answer",
-		dataIndex: "answer",
-		render: (answer) => <Tag color="green">{answer}</Tag>,
-	},
-	{
-		title: "Category",
-		dataIndex: "category",
-		render: (category) => <Tag color="geekblue">{category}</Tag>,
-	},
-];
+import Highlighter from "react-highlight-words";
 
 const QuizQuestions = ({ history }) => {
 	const { id } = useParams();
@@ -39,6 +22,41 @@ const QuizQuestions = ({ history }) => {
 	const { data: questions, isLoading: questionLoading } =
 		useIndex("/questions");
 	const { mutate, isLoading: isSaving } = useCreate("/quiz-questions");
+
+	const columns = [
+		{
+			title: "Question",
+			dataIndex: "text",
+			width: "60%",
+			render: (text) => (
+				<Highlighter
+					autoEscape
+					highlightClassName="text-highlight"
+					searchWords={[search]}
+					textToHighlight={text}
+				/>
+			),
+		},
+		{
+			title: "Answer",
+			dataIndex: "answer",
+			render: (answer) => <Tag color="green">{answer}</Tag>,
+		},
+		{
+			title: "Category",
+			dataIndex: "category",
+			render: (category) => (
+				<Tag color="geekblue">
+					<Highlighter
+						autoEscape
+						highlightClassName="text-highlight"
+						searchWords={[search]}
+						textToHighlight={category}
+					/>
+				</Tag>
+			),
+		},
+	];
 
 	const [selectedRows, setSelectedRows] = useState(
 		data && data.data.quizQuestions.map((d) => d.id)

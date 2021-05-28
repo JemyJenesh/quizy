@@ -1,6 +1,7 @@
 import { Table, Button, Input, Tag } from "antd";
 import { SearchOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import Highlighter from "react-highlight-words";
 
 const QuizQuestionsTable = ({
 	data,
@@ -16,6 +17,14 @@ const QuizQuestionsTable = ({
 		{
 			title: "Question",
 			dataIndex: "text",
+			render: (text) => (
+				<Highlighter
+					autoEscape
+					highlightClassName="text-highlight"
+					searchWords={[search]}
+					textToHighlight={text}
+				/>
+			),
 		},
 		{
 			title: "Answer",
