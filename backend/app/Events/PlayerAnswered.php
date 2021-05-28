@@ -14,16 +14,18 @@ class PlayerAnswered implements ShouldBroadcast {
   public $quizId;
   public $players;
   public $correct;
+  public $option;
 
   /**
    * Create a new event instance.
    *
    * @return void
    */
-  public function __construct($quizId, $correct) {
+  public function __construct($quizId, $correct, $option) {
     $this->quizId = $quizId;
     $this->players = Player::where('quiz_id', $quizId)->get();
     $this->correct = $correct;
+    $this->option = $option;
   }
 
   /**

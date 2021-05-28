@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\QuizQuestionResource;
+use App\Http\Resources\QuestionResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GameQuizResource extends JsonResource {
@@ -20,8 +20,7 @@ class GameQuizResource extends JsonResource {
       'turn' => $this->turn,
       'pin' => $this->pin,
       'players_count' => $this->players->count(),
-      'question' => new QuizQuestionResource($this->question),
-      'quizQuestions' => QuizQuestionResource::collection($this->quizQuestions()->with('question')->get())->groupBy('question.category.name'),
+      'question' => new QuestionResource($this->question),
       'created_at' => $this->created_at->diffForHumans(),
       'updated_at' => $this->updated_at->diffForHumans(),
     ];

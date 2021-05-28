@@ -22,8 +22,13 @@ import QuizQuestionsTable from "./quizzes/QuizQuestionsTable";
 import PlayersList from "./players/PlayersList";
 import PlayerInfo from "./players/PlayerInfo";
 import GuestLayout from "./shared/GuestLayout";
+import PlayersScoreDrawer from "./players/PlayersScoreDrawer";
+import If from "./shared/If";
+import PlayersScoreboard from "./players/PlayersScoreboard";
+import PlayerHeader from "./players/PlayerHeader";
 export {
 	// shared
+	If,
 	AppLayout,
 	GuestLayout,
 	AuthRoute,
@@ -47,4 +52,7 @@ export {
 	// players
 	PlayersList,
 	PlayerInfo,
+	PlayersScoreDrawer,
+	PlayersScoreboard,
+	PlayerHeader,
 };

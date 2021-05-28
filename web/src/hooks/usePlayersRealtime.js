@@ -4,7 +4,7 @@ import { axios } from "utils/axios";
 import echo from "utils/echo";
 
 const usePlayersRealtime = (quizId, playerId = null) => {
-	const [players, setPlayers] = useState(null);
+	const [players, setPlayers] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isKicking, setIsKicking] = useState(false);
 
@@ -23,8 +23,6 @@ const usePlayersRealtime = (quizId, playerId = null) => {
 			setIsKicking(false);
 		}
 	};
-
-	useEffect(() => {}, []);
 
 	useEffect(() => {
 		if (quizId) {
@@ -56,7 +54,7 @@ const usePlayersRealtime = (quizId, playerId = null) => {
 					playerId && kickedPlayer.id.toString() === playerId.toString();
 				if (samePlayer) {
 					setTimeout(() => {
-						history.push("/");
+						window.location.href = "/";
 					}, 2000);
 					message.error(`You has been kicked out of the quiz!`);
 				} else {

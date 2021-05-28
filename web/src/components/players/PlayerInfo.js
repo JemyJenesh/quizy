@@ -1,41 +1,40 @@
-import { List, Typography } from "antd";
+import { Badge, Button, Col, Row, Typography } from "antd";
+import { UnorderedListOutlined } from "@ant-design/icons";
 
-const PlayerInfo = ({ player, turn }) => {
+const PlayerInfo = ({ player, toggleDrawer }) => {
 	return (
-		<>
-			<List
-				style={{
-					backgroundColor: player && player.order === turn ? "#E6F7FF" : "#fff",
-				}}
-				size="small"
-				header={
-					<Typography.Title level={5} style={{ margin: 0 }}>
-						{player?.name} (You)
+		<div className="container">
+			<Row align="middle">
+				<Col lg={0} flex={0}>
+					<Button
+						shape="circle"
+						onClick={toggleDrawer}
+						icon={<UnorderedListOutlined style={{ color: "#2db7f5" }} />}
+					/>
+				</Col>
+				<Col flex={1}>
+					<Typography.Title
+						type="secondary"
+						level={3}
+						style={{ margin: 0, textAlign: "center" }}
+					>
+						{player?.name}
 					</Typography.Title>
-				}
-				bordered
-				loading={!player}
-			>
-				{/* <List.Item actions={[<Typography.Text>20</Typography.Text>]}>
-				Attempts
-			</List.Item>
-			<List.Item
-				actions={[<Badge count={10} style={{ backgroundColor: "#52c41a" }} />]}
-			>
-				Correct answers
-			</List.Item>
-			<List.Item
-				actions={[<Badge count={10} style={{ backgroundColor: "#1890FF" }} />]}
-			>
-				Bonus Score
-			</List.Item> */}
-				<List.Item
-					actions={[<Typography.Text>{player?.score}</Typography.Text>]}
-				>
-					Score
-				</List.Item>
-			</List>
-		</>
+				</Col>
+				<Col flex={0}>
+					<Badge
+						count={player?.score}
+						overflowCount={999}
+						style={{
+							color: "dimgrey",
+							backgroundColor: "#fff",
+							fontSize: "1.5rem",
+						}}
+						showZero
+					/>
+				</Col>
+			</Row>
+		</div>
 	);
 };
 

@@ -138,7 +138,7 @@ class GameController extends Controller {
         'score' => $player->score - 2,
       ]);
 
-      PlayerAnswered::dispatch($player->quiz_id, null);
+      PlayerAnswered::dispatch($player->quiz_id, null, $request->option_id);
 
       return response(null, 200);
     }
@@ -155,7 +155,7 @@ class GameController extends Controller {
       ]);
     }
 
-    PlayerAnswered::dispatch($player->quiz_id, $isCorrect);
+    PlayerAnswered::dispatch($player->quiz_id, $isCorrect, $request->option_id);
 
     return response(null, 200);
 

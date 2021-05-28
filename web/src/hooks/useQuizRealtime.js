@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import echo from "utils/echo";
 import { axios } from "utils/axios";
 import { message } from "antd";
+import { config } from "common";
 
-const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
+const useQuizRealtime = (quizId, player = null, onEventStart = () => {}) => {
 	const [quiz, setQuiz] = useState(null);
 	const [question, setQuestion] = useState(null);
 	const [hasEnded, setHasEnded] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+	const [isTurn, setIsTurn] = useState(false);
 
 	const timer = useRef();
 
-	const isTurn = playerOrder && playerOrder === quiz.turn;
 	const [time, setTime] = useState(0);
 
 	const [isChanging, setIsChanging] = useState(false);
@@ -21,7 +22,7 @@ const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
 	const changeQuestion = async ({ category_id }, cb) => {
 		setIsChanging(true);
 		try {
-			const { status } = await axios.put(`/games/${id}`, {
+			const { status } = await axios.put(`/games/${quizId}`, {
 				category_id,
 			});
 			if (status === 200) {
@@ -74,10 +75,11 @@ const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
 	useEffect(() => {
 		if (quizId) {
 			setIsLoading(true);
-			axios(`/quizzes/${quizId}`)
+			axios(`/games/${quizId}`)
 				.then((res) => {
 					if (res.status === 200) {
-						console.log(res);
+						setQuestion(res.data.data.question);
+						setQuiz(res.data.data);
 					}
 				})
 				.catch((err) => {
@@ -89,14 +91,18 @@ const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
 					setIsLoading(false);
 				});
 			echo.channel(`quiz-${quizId}`).listen("QuestionChanged", (e) => {
+				message.info("New question");
 				onEventStart();
 				setQuestion(e.question);
 				setQuiz(e.quiz);
-				setTime(COUNTDOWN);
-				let cd = COUNTDOWN;
+				setTime(config.COUNTDOWN);
+				let cd = config.COUNTDOWN;
 				timer.current = setInterval(() => {
 					if (cd < 1) {
-						if (isTurn) submit();
+						if (isTurn) {
+							message.info("sending answer");
+							submitAnswer({ option_id: null, player_id: player.id });
+						}
 						clearInterval(timer.current);
 					} else {
 						cd--;
@@ -108,12 +114,12 @@ const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
 			echo.channel(`quiz-${quizId}`).listen("QuestionPassed", (e) => {
 				onEventStart();
 				setQuiz(e.quiz);
-				setTime(PASS_COUNTDOWN);
-				let cd = PASS_COUNTDOWN;
+				setTime(config.PASS_COUNTDOWN);
+				let cd = config.PASS_COUNTDOWN;
 				clearInterval(timer.current);
 				timer.current = setInterval(() => {
 					if (cd < 1) {
-						if (isTurn) submit();
+						if (isTurn) submitAnswer({ option_id: null, player_id: player.id });
 						clearInterval(timer.current);
 					} else {
 						cd--;
@@ -141,7 +147,11 @@ const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
 				echo.leaveChannel(`quiz-${quizId}`);
 			};
 		}
-	}, [quizId]);
+	}, [quizId, isTurn]);
+
+	useEffect(() => {
+		if (quiz && player) setIsTurn(quiz.turn === player.order);
+	}, [quiz, player]);
 
 	return {
 		isLoading,
@@ -155,6 +165,7 @@ const useQuizRealtime = (quizId, playerOrder = null, onEventStart) => {
 		passQuestion,
 		isPassing,
 		time,
+		isTurn,
 	};
 };
 
