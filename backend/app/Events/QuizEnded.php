@@ -12,7 +12,7 @@ class QuizEnded implements ShouldBroadcast {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   public $quiz;
-  public $message;
+  public $winner_player_id;
 
   /**
    * Create a new event instance.
@@ -21,7 +21,7 @@ class QuizEnded implements ShouldBroadcast {
    */
   public function __construct($quiz) {
     $this->quiz = $quiz;
-    $this->message = $quiz->players->count() > 0 ? $quiz->players()->orderBy('score', 'desc')->first()->name . ' won the quiz!' : 'Thanks for participating!';
+    $this->winner_player_id = $quiz->players->count() > 0 ? $quiz->players()->orderBy('score', 'desc')->first()->id : null;
   }
 
   /**

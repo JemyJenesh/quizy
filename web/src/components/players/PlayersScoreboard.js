@@ -1,33 +1,24 @@
 import { Badge, List } from "antd";
-import { usePlayersRealtime } from "hooks";
 
 const positionColor = (index) =>
 	["#52c41a", "#108ee9", "maroon", "#ccc"][index < 3 ? index : 3];
 
-const PlayersScoreboard = ({ title = null, quizId }) => {
-	const { isLoading, players } = usePlayersRealtime(quizId);
-
+const PlayersScoreboard = ({ players, currentPlayerId }) => {
 	return (
 		<List
-			header={title}
-			loading={isLoading}
+			size="small"
+			loading={!players}
 			itemLayout="horizontal"
 			dataSource={players}
-			bordered={!!title}
 			renderItem={(player, index) => (
 				<List.Item
-					extra={
-						<Badge
-							count={player.score}
-							showZero
-							overflowCount={999}
-							style={{
-								color: "dimgrey",
-								backgroundColor: "#fff",
-								fontSize: "1rem",
-							}}
-						/>
-					}
+					style={{
+						background:
+							player.id.toString() === currentPlayerId.toString()
+								? "#E6F7FF"
+								: "#fff",
+					}}
+					extra={player.score}
 				>
 					<List.Item.Meta
 						avatar={

@@ -1,7 +1,6 @@
 import { Drawer } from "antd";
-import PlayersScoreboard from "./PlayersScoreboard";
 
-const PlayersScoreDrawer = ({ open, onClose, quizId }) => {
+const PlayersScoreDrawer = ({ open, onClose, children }) => {
 	return (
 		<Drawer
 			title="Scoreboard"
@@ -10,9 +9,7 @@ const PlayersScoreDrawer = ({ open, onClose, quizId }) => {
 			visible={open}
 			height="100%"
 		>
-			<div style={{ maxWidth: 360, margin: "0 auto" }}>
-				<PlayersScoreboard quizId={quizId} />
-			</div>
+			<div style={{ maxWidth: 360, margin: "0 auto" }}>{children}</div>
 		</Drawer>
 	);
 };
