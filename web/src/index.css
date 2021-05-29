@@ -21,7 +21,16 @@ body {
 	box-shadow: 0 0 0 1px #d9d9d9 inset;
 }
 
-.col {
-	height: 2rem;
-	background-color: greenyellow;
+.text-center {
+	text-align: center;
+}
+
+.tag {
+	font-size: 1.1rem;
+	padding: 0.75rem 1rem;
+	width: 100%;
+}
+
+.m-0 {
+	margin: 0;
 }

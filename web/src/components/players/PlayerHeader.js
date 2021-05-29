@@ -1,4 +1,4 @@
-import { Row, Col, Progress, Typography, Divider } from "antd";
+import { Row, Col, Progress, Typography, Divider, Badge } from "antd";
 import { config } from "common";
 import { If } from "components";
 
@@ -44,12 +44,30 @@ const PlayerHeader = ({ hasEnded, question, quiz, time }) => {
 								/>
 							</Col>
 							<Col flex={0}>
-								<Typography.Title
-									level={5}
-									style={{ width: "2.5rem", textAlign: "end", margin: 0 }}
+								<div
+									style={{
+										width: "3rem",
+										textAlign: "end",
+										display: "flex",
+										alignItems: "flex-end",
+										justifyContent: "flex-end",
+									}}
 								>
-									{time}s
-								</Typography.Title>
+									<Badge
+										style={{
+											backgroundColor: "#fff",
+											color: "#000",
+											fontSize: "1rem",
+											height: "1.5rem",
+											lineHeight: "1.5rem",
+											padding: 0,
+										}}
+										count={time}
+										showZero
+										overflowCount={999}
+									/>
+									s
+								</div>
 							</Col>
 						</If>
 						<If when={!question}>

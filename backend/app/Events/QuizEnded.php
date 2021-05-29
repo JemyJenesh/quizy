@@ -21,7 +21,7 @@ class QuizEnded implements ShouldBroadcast {
    */
   public function __construct($quiz) {
     $this->quiz = $quiz;
-    $this->message = $quiz->players()->orderBy('score', 'asc')->first()->name . ' won the quiz!';
+    $this->message = $quiz->players->count() > 0 ? $quiz->players()->orderBy('score', 'desc')->first()->name . ' won the quiz!' : 'Thanks for participating!';
   }
 
   /**

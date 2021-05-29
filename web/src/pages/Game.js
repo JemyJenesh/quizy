@@ -1,16 +1,30 @@
-import { useEffect, useState } from "react";
-import { Button, List, Popconfirm, Row, Col, Tag, Space, Select } from "antd";
-import { useDelete, useShow } from "api";
-import { Header, PageLoader, PlayersList } from "components";
+import { useEffect, useState, useRef } from "react";
+import {
+	Button,
+	List,
+	Popconfirm,
+	Row,
+	Col,
+	Tag,
+	Space,
+	Select,
+	message,
+} from "antd";
+import { useDelete } from "api";
+import { Header, PageLoader, PlayerHeader, PlayersList } from "components";
 import { useParams } from "react-router";
 import Checkbox from "antd/lib/checkbox/Checkbox";
 import { axios } from "utils/axios";
+import echo from "utils/echo";
 import { useQuery } from "react-query";
+import { config } from "common";
 
 const { Option } = Select;
 
 const Game = ({ history }) => {
 	const { id } = useParams();
+	const timer = useRef();
+	const [time, setTime] = useState(0);
 
 	const [category, setCategory] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -44,6 +58,52 @@ const Game = ({ history }) => {
 			);
 		}
 	}, [data, category]);
+
+	useEffect(() => {
+		if (id) {
+			echo.channel(`quiz-${id}`).listen("QuestionChanged", (e) => {
+				setTime(config.COUNTDOWN);
+				let cd = config.COUNTDOWN;
+				timer.current = setInterval(() => {
+					if (cd < 1) {
+						clearInterval(timer.current);
+					} else {
+						cd--;
+						setTime((prev) => prev - 1);
+					}
+				}, 1000);
+			});
+			echo.channel(`quiz-${id}`).listen("QuestionPassed", (e) => {
+				message.info("Question is passed!");
+				setTime(config.PASS_COUNTDOWN);
+				let cd = config.PASS_COUNTDOWN;
+				clearInterval(timer.current);
+				timer.current = setInterval(() => {
+					if (cd < 1) {
+						clearInterval(timer.current);
+					} else {
+						cd--;
+						setTime((prev) => prev - 1);
+					}
+				}, 1000);
+			});
+
+			echo.channel(`quiz-${id}`).listen("QuestionPassingEnd", (e) => {
+				setTime(0);
+				clearInterval(timer.current);
+				message.info("The question is now passed to Audience!");
+			});
+
+			echo.channel(`quiz-${id}`).listen("PlayerAnswered", (e) => {
+				setTime(0);
+				clearInterval(timer.current);
+			});
+
+			return () => {
+				echo.leaveChannel(`quiz-${id}`);
+			};
+		}
+	}, [id]);
 
 	if (isLoading) return <PageLoader />;
 
@@ -85,13 +145,12 @@ const Game = ({ history }) => {
 							>
 								{data &&
 									data.data.categories.map(
-										({
-											id,
-											name,
-											questions_count,
-											remaining_questions_count,
-										}) => (
+										(
+											{ id, name, questions_count, remaining_questions_count },
+											i
+										) => (
 											<Option
+												selected={true}
 												key={id}
 												value={id}
 												disabled={remaining_questions_count < 1}
@@ -105,13 +164,26 @@ const Game = ({ history }) => {
 							<Button
 								type="primary"
 								disabled={
-									!category || category.remaining_questions_count < 1 || loading
+									!category ||
+									category.remaining_questions_count < 1 ||
+									loading ||
+									time > 0
 								}
 								onClick={nextQuestion}
 							>
 								Next question
 							</Button>
 						</Space>
+						<Row>
+							<Col span={24}>
+								<PlayerHeader
+									hasEnded={false}
+									time={time}
+									question={data.data.question}
+									quiz={data.data}
+								/>
+							</Col>
+						</Row>
 						<Row gutter={8}>
 							{data &&
 								Object.keys(data.data.quizQuestions).map((category) => (

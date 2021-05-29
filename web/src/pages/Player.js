@@ -5,7 +5,7 @@ import {
 	SyncOutlined,
 	CloseCircleOutlined,
 } from "@ant-design/icons";
-import { Row, Col, Button, Tag, Typography, Result, message } from "antd";
+import { Row, Col, Button, Tag, Typography, Result, message, Grid } from "antd";
 import {
 	PlayerHeader,
 	PlayerInfo,
@@ -17,6 +17,8 @@ import { useParams } from "react-router";
 import { axios } from "utils/axios";
 import echo from "utils/echo";
 
+const { useBreakpoint } = Grid;
+
 const COUNTDOWN = 20;
 const PASS_COUNTDOWN = 10;
 const returnIndexToAlphabhet = (index) => ["A", "B", "C", "D"][index];
@@ -24,6 +26,9 @@ const returnIndexToAlphabhet = (index) => ["A", "B", "C", "D"][index];
 const Player = ({ history }) => {
 	const timer = useRef();
 	const { quizId, playerId } = useParams();
+	const screens = useBreakpoint();
+	const isSmall = screens.xs || screens.sm || screens.md;
+	const isLarge = screens.lg || screens.xl || screens.xxl;
 	const [ended, setEnded] = useState(false);
 	const [player, setPlayer] = useState(null);
 	const [quiz, setQuiz] = useState(null);
@@ -33,6 +38,7 @@ const Player = ({ history }) => {
 	const [isTurn, setIsTurn] = useState(false);
 	const [time, setTime] = useState(0);
 	const [submitting, setSubmitting] = useState(false);
+	const [isPassing, setIsPassing] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const toggleDrawer = () => setIsOpen(!isOpen);
 	const [showAnswer, setShowAnswer] = useState(false);
@@ -67,6 +73,7 @@ const Player = ({ history }) => {
 	};
 
 	const handlePass = () => {
+		setIsPassing(true);
 		clearInterval(timer.current);
 		setTime(0);
 		axios
@@ -77,7 +84,8 @@ const Player = ({ history }) => {
 				if (err.response) {
 					message.error("Something went wrong!");
 				}
-			});
+			})
+			.finally(() => setIsPassing(false));
 	};
 
 	useEffect(() => {
@@ -100,76 +108,82 @@ const Player = ({ history }) => {
 	}, [playerId]);
 
 	useEffect(() => {
-		echo.channel(`quiz-${quizId}`).listen("QuestionChanged", (e) => {
-			setShowAnswer(false);
-			setAnswer(null);
-			setQuestion(e.question);
-			setQuiz(e.quiz);
-			setTime(COUNTDOWN);
-			let cd = COUNTDOWN;
-			timer.current = setInterval(() => {
-				if (cd < 1) {
-					if (isTurn) submit();
-					clearInterval(timer.current);
-				} else {
-					cd--;
-					setTime((prev) => prev - 1);
-				}
-			}, 1000);
-		});
-		echo.channel(`quiz-${quizId}`).listen("QuestionPassed", (e) => {
-			console.log(e);
-			setAnswer(null);
-			setQuiz(e.quiz);
-			setTime(PASS_COUNTDOWN);
-			let cd = PASS_COUNTDOWN;
-			clearInterval(timer.current);
-			timer.current = setInterval(() => {
-				if (cd < 1) {
-					if (isTurn) submit();
-					clearInterval(timer.current);
-				} else {
-					cd--;
-					setTime((prev) => prev - 1);
-				}
-			}, 1000);
-		});
+		if (quizId) {
+			echo.channel(`quiz-${quizId}`).listen("QuestionChanged", (e) => {
+				setShowAnswer(false);
+				setAnswer(null);
+				setQuestion(e.question);
+				setQuiz(e.quiz);
+				setTime(COUNTDOWN);
+				let cd = COUNTDOWN;
+				timer.current = setInterval(() => {
+					if (cd < 1) {
+						if (isTurn) submit();
+						clearInterval(timer.current);
+					} else {
+						cd--;
+						setTime((prev) => prev - 1);
+					}
+				}, 1000);
+			});
+			echo.channel(`quiz-${quizId}`).listen("QuestionPassed", (e) => {
+				setAnswer(null);
+				setQuiz(e.quiz);
+				setTime(PASS_COUNTDOWN);
+				let cd = PASS_COUNTDOWN;
+				clearInterval(timer.current);
+				timer.current = setInterval(() => {
+					if (cd < 1) {
+						if (isTurn) submit();
+						clearInterval(timer.current);
+					} else {
+						cd--;
+						setTime((prev) => prev - 1);
+					}
+				}, 1000);
+			});
 
-		echo.channel(`quiz-${quizId}`).listen("QuestionPassingEnd", (e) => {
-			setTime(0);
-			clearInterval(timer.current);
-			message.info("The question is now passed to Audience!");
-		});
+			echo.channel(`quiz-${quizId}`).listen("QuestionPassingEnd", (e) => {
+				setTime(0);
+				clearInterval(timer.current);
+				message.info("The question is now passed to Audience!");
+			});
 
-		echo.channel(`quiz-${quizId}`).listen("QuizEnded", (e) => {
-			setEnded(true);
-			setEndMessage(e.message);
-		});
+			echo.channel(`quiz-${quizId}`).listen("QuizEnded", (e) => {
+				setEnded(true);
+				setEndMessage(e.message);
+			});
 
-		echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
-			setTime(0);
-			clearInterval(timer.current);
-			setShowAnswer(true);
-			setPlayer(e.players.find((p) => p.id.toString() === playerId.toString()));
-			setSelectedOption(e.option);
-		});
+			echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
+				setTime(0);
+				clearInterval(timer.current);
+				setShowAnswer(true);
+				setPlayer(
+					e.players.find((p) => p.id.toString() === playerId.toString())
+				);
+				setSelectedOption(e.option);
+			});
 
-		return () => {
-			echo.leaveChannel(`quiz-${quizId}`);
-		};
+			return () => {
+				echo.leaveChannel(`quiz-${quizId}`);
+			};
+		}
 	}, [quizId]);
 
 	useEffect(() => {
-		if (quiz && player) setIsTurn(quiz.turn === player.order);
+		if (quiz && player)
+			setIsTurn(quiz.turn.toString() === player.order.toString());
 	}, [quiz, player]);
 
 	return (
 		<div style={{ minHeight: "100vh" }}>
-			<PlayersScoreDrawer
-				open={isOpen}
-				onClose={toggleDrawer}
-				quizId={quizId}
-			/>
+			<If when={isSmall}>
+				<PlayersScoreDrawer
+					open={isOpen}
+					onClose={toggleDrawer}
+					quizId={quizId}
+				/>
+			</If>
 			<PlayerHeader
 				hasEnded={ended}
 				quiz={quiz}
@@ -188,7 +202,9 @@ const Player = ({ history }) => {
 					<If when={question}>
 						<Row gutter={[24, 24]}>
 							<Col xs={0} lg={6}>
-								<PlayersScoreboard title="Scoreboard" quizId={quizId} />
+								<If when={isLarge}>
+									<PlayersScoreboard title="Scoreboard" quizId={quizId} />
+								</If>
 							</Col>
 							<Col xs={24} lg={18}>
 								<Row justify="space-between" gutter={[24, 24]}>
@@ -240,6 +256,7 @@ const Player = ({ history }) => {
 												size="large"
 												disabled={time < 1}
 												onClick={handlePass}
+												loading={isPassing}
 											>
 												Pass
 											</Button>

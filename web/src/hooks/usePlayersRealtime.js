@@ -67,17 +67,11 @@ const usePlayersRealtime = (quizId, playerId = null) => {
 
 			echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
 				if (e.correct === null) {
-					notification.warning({
-						message: "Time's Up!",
-					});
+					message.warning("Time's Up!");
 				} else if (e.correct) {
-					notification.success({
-						message: "Correct Answer!",
-					});
+					message.success("Correct Answer!");
 				} else {
-					notification.error({
-						message: "Wrong Answer!",
-					});
+					message.error("Wrong Answer!");
 				}
 				setPlayers(e.players.sort((a, b) => b.score - a.score));
 			});
