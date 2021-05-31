@@ -75,6 +75,7 @@ const Game = ({ history }) => {
 			});
 			echo.channel(`quiz-${id}`).listen("QuestionPassed", (e) => {
 				message.info("Question is passed!");
+				refetch();
 				setTime(config.PASS_COUNTDOWN);
 				let cd = config.PASS_COUNTDOWN;
 				clearInterval(timer.current);
@@ -129,10 +130,10 @@ const Game = ({ history }) => {
 			/>
 			<div style={{ padding: "2rem" }}>
 				<Row gutter={24}>
-					<Col span={6}>
+					<Col xs={24} lg={6}>
 						<PlayersList quizId={id} turn={data && data.data.turn} />
 					</Col>
-					<Col span={18}>
+					<Col xs={24} lg={18}>
 						<Space align="center" style={{ marginBottom: "1rem" }}>
 							<label>Category</label>
 							<Select

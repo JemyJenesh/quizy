@@ -128,17 +128,18 @@ class GameController extends Controller {
 
   public function answer(Request $request) {
     $request->validate([
-      'player_id' => 'required',
+      'quiz_id' => 'required',
     ]);
 
-    $player = Player::find($request->player_id);
+    $quiz = Quiz::find($request->quiz_id);
+    $player = $quiz->players()->where('order', $quiz->turn)->first();
 
     if (is_null($request->option_id)) {
       $player->update([
-        'score' => $player->score - 2,
+        'score' => $player->score - ($quiz->is_passed ? 0 : 2),
       ]);
 
-      PlayerAnswered::dispatch($player->quiz_id, null, $request->option_id);
+      PlayerAnswered::dispatch($quiz->id, null, $request->option_id);
 
       return response(null, 200);
     }
@@ -147,15 +148,15 @@ class GameController extends Controller {
 
     if ($isCorrect) {
       $player->update([
-        'score' => $player->score + ($player->quiz->is_passed ? 5 : 10),
+        'score' => $player->score + ($quiz->is_passed ? 5 : 10),
       ]);
     } else {
       $player->update([
-        'score' => $player->score - ($player->quiz->is_passed ? 0 : 2),
+        'score' => $player->score - ($quiz->is_passed ? 0 : 2),
       ]);
     }
 
-    PlayerAnswered::dispatch($player->quiz_id, $isCorrect, $request->option_id);
+    PlayerAnswered::dispatch($quiz->id, $isCorrect, $request->option_id);
 
     return response(null, 200);
 

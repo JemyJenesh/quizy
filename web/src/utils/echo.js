@@ -8,7 +8,7 @@ const options = {
 	key: "493f903d3fd2e1100659",
 	cluster: "ap2",
 	forceTLS: false,
-	wsHost: "192.168.1.4",
+	wsHost: "127.0.0.1",
 	wsPort: 6001,
 	encrypted: false,
 	disableStats: true,

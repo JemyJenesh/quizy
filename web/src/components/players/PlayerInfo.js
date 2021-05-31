@@ -3,9 +3,9 @@ import { UnorderedListOutlined } from "@ant-design/icons";
 
 const PlayerInfo = ({ player, toggleDrawer }) => {
 	return (
-		<div className="container">
+		<div className="container-sm">
 			<Row align="middle">
-				<Col lg={0} flex={0}>
+				<Col flex={0}>
 					<Button
 						shape="circle"
 						onClick={toggleDrawer}
