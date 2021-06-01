@@ -7,7 +7,6 @@ import {
 	Progress,
 	Result,
 	Row,
-	Space,
 	Spin,
 	Tag,
 	Typography,
@@ -27,7 +26,7 @@ import {
 	PlayersScoreboard,
 	PlayersScoreDrawer,
 } from "components";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import echo from "utils/echo";
 import { axios } from "utils/axios";
@@ -145,7 +144,6 @@ const Player = ({ history }) => {
 
 			echo.channel(`quiz-${player.quiz_id}`).listen("QuestionPassed", (e) => {
 				setHasAnswered(false);
-				message.info(e.quiz.turn === player.order);
 				setIsMyTurn(e.quiz.turn === player.order);
 				setQuizStatus(QUIZ_STATUS.RUNNING);
 				setShowAnswer(false);
