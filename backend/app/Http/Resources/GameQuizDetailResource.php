@@ -37,6 +37,7 @@ class GameQuizDetailResource extends JsonResource {
       //   }])->whereIn('id', $this->questions->map(function ($item) {
       //   return $item['category_id'];
       // })->unique())->get()),
+      'players' => $this->players,
       'is_passed' => $this->is_passed,
       'question' => new QuestionResource($this->question),
       'created_at' => $this->created_at->diffForHumans(),

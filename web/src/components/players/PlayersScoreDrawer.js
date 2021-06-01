@@ -9,7 +9,7 @@ const PlayersScoreDrawer = ({ open, onClose, children }) => {
 			visible={open}
 			height="100%"
 		>
-			<div style={{ maxWidth: 360, margin: "0 auto" }}>{children}</div>
+			<div style={{ maxWidth: 400, margin: "0 auto" }}>{children}</div>
 		</Drawer>
 	);
 };

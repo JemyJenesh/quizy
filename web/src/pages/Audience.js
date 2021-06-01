@@ -1,80 +1,357 @@
-import React from "react";
-import { Row, Col, Progress, Tag, Typography, Space } from "antd";
-import { PlayersList } from "components";
+import {
+	Affix,
+	Badge,
+	Button,
+	Col,
+	Divider,
+	message,
+	Progress,
+	Result,
+	Row,
+	Spin,
+	Tag,
+	Typography,
+} from "antd";
+import {
+	SmileFilled,
+	CloseCircleOutlined,
+	CheckCircleOutlined,
+	UnorderedListOutlined,
+} from "@ant-design/icons";
+import { config } from "common";
+import { If, PlayersScoreboard, PlayersScoreDrawer } from "components";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
+import echo from "utils/echo";
+import { axios } from "utils/axios";
+import { useQuery } from "react-query";
+
+const returnIndexToAlphabhet = (index) => ["A", "B", "C", "D"][index];
 
 const Audience = () => {
 	const { quizId } = useParams();
+	const { data, isLoading } = useQuery(["audience", quizId], async () => {
+		const { data } = await axios(`/games/${quizId}/audience`);
+		return data;
+	});
+
+	const [players, setPlayers] = useState(null);
+	const [question, setQuestion] = useState(null);
+	const [quiz, setQuiz] = useState(null);
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
+
+	const timer = useRef();
+	const [time, setTime] = useState(0);
+
+	const [showAnswer, setShowAnswer] = useState(false);
+	const [choosenOption, setChoosenOption] = useState(null);
+	const [hasEnded, setHasEnded] = useState(false);
+
+	useEffect(() => {
+		if (data) {
+			const { players, quiz, question } = data;
+			setPlayers(players);
+			setQuestion(question);
+			setQuiz(quiz);
+			setHasEnded(!quiz.pin && !question);
+		}
+	}, [data]);
+
+	useEffect(() => {
+		if (quizId) {
+			echo.channel(`quiz-${quizId}`).listen("QuestionChanged", (e) => {
+				setShowAnswer(false);
+				setQuestion(e.question);
+				setQuiz(e.quiz);
+				clearInterval(timer.current);
+				const tempTime = config.COUNTDOWN;
+				setTime(tempTime);
+				let cd = tempTime;
+				timer.current = setInterval(() => {
+					if (cd < 1) {
+						clearInterval(timer.current);
+					} else {
+						cd--;
+						setTime((prev) => prev - 1);
+					}
+				}, 1000);
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("QuestionPassed", (e) => {
+				setShowAnswer(false);
+				setQuiz(e.quiz);
+				clearInterval(timer.current);
+				const tempTime = config.PASS_COUNTDOWN;
+				setTime(tempTime);
+				let cd = tempTime;
+				timer.current = setInterval(() => {
+					if (cd < 1) {
+						clearInterval(timer.current);
+					} else {
+						cd--;
+						setTime((prev) => prev - 1);
+					}
+				}, 1000);
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("QuestionPassingEnd", (e) => {
+				setTime(0);
+				clearInterval(timer.current);
+				message.info("The question is now passed to Audience!");
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("QuizEnded", (e) => {
+				setHasEnded(true);
+				setIsDrawerOpen(true);
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("PlayerJoined", (e) => {
+				message.success(`${e.player.name} has joined the quiz!`);
+				setPlayers((prev) => [...prev, e.player]);
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("PlayerKicked", (e) => {
+				let kickedPlayer = e.player;
+				message.warning(
+					`${kickedPlayer.name} has been kicked out of the quiz!`
+				);
+				setPlayers((prev) =>
+					prev.filter((player) => player.id !== kickedPlayer.id)
+				);
+			});
+
+			echo.channel(`quiz-${quizId}`).listen("PlayerAnswered", (e) => {
+				setTime(0);
+				setShowAnswer(true);
+				clearInterval(timer.current);
+
+				setPlayers(e.players.sort((a, b) => b.score - a.score));
+				setChoosenOption(e.option);
+
+				if (e.correct === null) {
+					message.warning("Time's Up!");
+				}
+			});
+
+			return () => {
+				echo.leaveChannel(`quiz-${quizId}`);
+			};
+		}
+	}, [quizId]);
+
+	if (isLoading)
+		return (
+			<Spin spinning size="large">
+				<div className="mvh-100" />
+			</Spin>
+		);
+
 	return (
-		<div style={styles.container}>
-			<Row gutter={12}>
-				{/* <Col span={5}>
-					<PlayersList quizId={quizId} />
-				</Col> */}
-				<Col span={24}>
-					<Space direction="vertical" align="center" style={styles.fill}>
-						<Typography.Title level={1} style={styles.text}>
-							What is the height of Mt. Everest? Lorem ipsum dolor sit amet
-							consectetur adipisicing elit. Voluptates perferendis quia dolore
-							reiciendis, aperiam alias nobis labore quo optio possimus.
-						</Typography.Title>
-						<Tag color="geekblue" style={styles.category}>
-							General
-						</Tag>
-						<Row style={styles.optionsContainer} gutter={12}>
-							<Col span={12}>
-								<Tag style={styles.option}>8848 mt.</Tag>
-							</Col>
-							<Col span={12}>
-								<Tag style={styles.option}>8848 mt.</Tag>
-							</Col>
-							<Col span={12}>
-								<Tag style={styles.option}>8848 mt.</Tag>
-							</Col>
-							<Col span={12}>
-								<Tag style={styles.option}>8848 mt.</Tag>
-							</Col>
+		<div className="mvh-100">
+			<PlayersScoreDrawer open={isDrawerOpen} onClose={toggleDrawer}>
+				<PlayersScoreboard
+					players={players}
+					currentPlayerId={null}
+					size="large"
+				/>
+			</PlayersScoreDrawer>
+			<If when={!hasEnded && !question}>
+				<WaitingHeader toggleDrawer={toggleDrawer} />
+			</If>
+			<If when={!hasEnded && !!question}>
+				<RunningHeader toggleDrawer={toggleDrawer} quiz={quiz} time={time} />
+			</If>
+			<If when={hasEnded}>
+				<EndingHeader toggleDrawer={toggleDrawer} />
+			</If>
+			<Divider style={styles.m0} />
+			<If when={!hasEnded && !question}>
+				<Result title={quiz?.pin} icon={null} />
+				<Result
+					title="The quiz will start soon!"
+					icon={<Spin spinning size="large" />}
+				/>
+			</If>
+			<If when={!hasEnded && !!question}>
+				<div className="container">
+					<Row>
+						<Col xs={24}>
+							<Typography.Title
+								className="text-center"
+								style={{ margin: "1.5rem 0", fontSize: "4rem" }}
+							>
+								{question?.text}
+							</Typography.Title>
+						</Col>
+					</Row>
+					<div className="container-sm">
+						<Row gutter={[24, 24]}>
+							{question?.options.map((option, idx) => {
+								const color =
+									showAnswer && option.is_correct
+										? "success"
+										: showAnswer &&
+										  choosenOption?.toString() === option.id.toString()
+										? "error"
+										: "default";
+								const icon =
+									showAnswer && option.is_correct ? (
+										<CheckCircleOutlined />
+									) : showAnswer &&
+									  choosenOption?.toString() === option.id.toString() ? (
+										<CloseCircleOutlined />
+									) : null;
+
+								return (
+									<Col key={option.id} xs={24} md={12}>
+										<Tag className="tag-lg" icon={icon} color={color}>
+											{returnIndexToAlphabhet(idx)}. {option.text}
+										</Tag>
+									</Col>
+								);
+							})}
 						</Row>
-						<Progress
-							type="circle"
-							percent={75}
-							format={(percent) => <h1 style={styles.time}>{`${percent}`}</h1>}
+					</div>
+				</div>
+			</If>
+			<If when={hasEnded}>
+				<QuizResult />
+			</If>
+			<Affix style={{ position: "absolute", bottom: 16, right: 16 }}>
+				<Button
+					type="primary"
+					disabled={!question || time > 0}
+					onClick={() => setShowAnswer(true)}
+				>
+					Show Answer
+				</Button>
+			</Affix>
+		</div>
+	);
+};
+
+const RunningHeader = ({ quiz, time, toggleDrawer }) => (
+	<div className="container">
+		<Row gutter={24}>
+			<Col flex={0}>
+				<Button
+					shape="circle"
+					icon={
+						<UnorderedListOutlined
+							style={{ color: "#2db7f5" }}
+							onClick={toggleDrawer}
 						/>
-					</Space>
-				</Col>
-			</Row>
+					}
+				/>
+			</Col>
+			<Col flex={1}>
+				<Progress
+					percent={
+						100 -
+						(((quiz?.is_passed ? config.PASS_COUNTDOWN : config.COUNTDOWN) -
+							time) /
+							(quiz?.is_passed ? config.PASS_COUNTDOWN : config.COUNTDOWN)) *
+							100
+					}
+					showInfo={false}
+					size="small"
+				/>
+			</Col>
+			<Col flex={0}>
+				<div style={styles.timeBadgeContainer}>
+					<Badge
+						style={styles.timeBadge}
+						count={time}
+						showZero
+						overflowCount={999}
+					/>
+					s
+				</div>
+			</Col>
+		</Row>
+	</div>
+);
+const WaitingHeader = ({ toggleDrawer }) => (
+	<div className="container">
+		<Row gutter={24}>
+			<Col flex={0}>
+				<Button
+					shape="circle"
+					icon={
+						<UnorderedListOutlined
+							style={{ color: "#2db7f5" }}
+							onClick={toggleDrawer}
+						/>
+					}
+				/>
+			</Col>
+			<Col flex={1}>
+				<Progress percent={100} status="active" size="small" showInfo={false} />
+				<Typography.Title level={5} className="text-center" style={styles.m0}>
+					Waiting for players...
+				</Typography.Title>
+			</Col>
+		</Row>
+	</div>
+);
+const EndingHeader = ({ toggleDrawer }) => (
+	<div className="container">
+		<Row gutter={24}>
+			<Col flex={0}>
+				<Button
+					shape="circle"
+					icon={
+						<UnorderedListOutlined
+							style={{ color: "#2db7f5" }}
+							onClick={toggleDrawer}
+						/>
+					}
+				/>
+			</Col>
+			<Col flex={1}>
+				<Progress
+					percent={100}
+					status="success"
+					size="small"
+					showInfo={false}
+				/>
+				<Typography.Title level={5} className="text-center" style={styles.m0}>
+					Quiz ended!
+				</Typography.Title>
+			</Col>
+		</Row>
+	</div>
+);
+const QuizResult = () => {
+	return (
+		<div className="container">
+			<Result
+				title="Thank you all for Participating!"
+				icon={<SmileFilled style={{ color: "#ffd63f" }} />}
+			/>
 		</div>
 	);
 };
 
 const styles = {
-	container: {
-		padding: "1rem",
-	},
-	time: {
+	m0: {
 		margin: 0,
 	},
-	text: {
-		textAlign: "center",
-		margin: "1rem 0",
+	timeBadgeContainer: {
+		width: "3rem",
+		textAlign: "end",
+		display: "flex",
+		alignItems: "flex-end",
+		justifyContent: "flex-end",
 	},
-	category: {
-		fontSize: "2rem",
-		padding: "1rem",
-	},
-	fill: {
-		width: "100%",
-	},
-	optionsContainer: {
-		width: "100%",
-		marginTop: "2rem",
-	},
-	option: {
-		width: "100%",
-		padding: "2rem",
-		fontSize: "2.5rem",
-		marginBottom: "2rem",
-		textAlign: "center",
+	timeBadge: {
+		backgroundColor: "#fff",
+		color: "#000",
+		fontSize: "1rem",
+		height: "1.5rem",
+		lineHeight: "1.5rem",
+		padding: 0,
 	},
 };
 

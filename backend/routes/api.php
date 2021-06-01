@@ -36,6 +36,7 @@ Route::apiResource('quizzes', QuizController::class);
 Route::apiResource('quiz-questions', QuizQuestionController::class)->only('store');
 
 Route::get('games/{id}/host', [GameController::class, 'showForHost']);
+Route::get('games/{id}/audience', [GameController::class, 'showForAudience']);
 Route::apiResource('games', GameController::class);
 
 Route::apiResource('quizzes.players', QuizPlayerController::class)->only(['index']);

@@ -39,6 +39,11 @@ body {
 	padding: 0.75rem 1rem;
 	width: 100%;
 }
+.tag-lg {
+	font-size: 2rem;
+	padding: 1rem;
+	width: 100%;
+}
 
 .m-0 {
 	margin: 0;

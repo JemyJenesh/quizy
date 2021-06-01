@@ -12,6 +12,7 @@ import { toggleSidebar } from "store/sidebarSlice";
 const Header = ({
 	title,
 	subTitle,
+	tag = null,
 	handleRefresh,
 	handleCreate,
 	handleUpload,
@@ -35,6 +36,7 @@ const Header = ({
 			backIcon={showIcon ? <MenuOutlined /> : null}
 			title={title}
 			subTitle={subTitle}
+			tags={tag}
 			extra={[
 				handleRefresh && (
 					<Tooltip title="Refresh" key="refresh">
