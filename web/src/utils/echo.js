@@ -1,5 +1,6 @@
 import Pusher from "pusher-js";
 import Echo from "laravel-echo";
+import { config } from "common";
 
 window.Pusher = Pusher;
 
@@ -8,7 +9,7 @@ const options = {
 	key: "493f903d3fd2e1100659",
 	cluster: "ap2",
 	forceTLS: false,
-	wsHost: "127.0.0.1",
+	wsHost: config.url,
 	wsPort: 6001,
 	encrypted: false,
 	disableStats: true,
